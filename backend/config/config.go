@@ -20,3 +20,11 @@ func GetDatabaseURL() string {
     }
     return url
 }
+
+func GetJWTSecret() string {
+    secret := os.Getenv("JWT_SECRET")
+    if secret == "" {
+        log.Fatal("JWT_SECRET not set in environment")
+    }
+    return secret
+}
