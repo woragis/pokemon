@@ -27,6 +27,9 @@ type Shout struct {
 	Comments     []ShoutComment `gorm:"constraint:OnDelete:CASCADE"`
 
 	// AIReplyContent *string     // Future feature
+
+	// Admin managed
+	IsFlagged bool `gorm:"default:false"`
 }
 
 type ShoutLike struct {
@@ -45,4 +48,7 @@ type ShoutComment struct {
 	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index"`
 	Content   string    `gorm:"type:text;not null"`
 	CreatedAt time.Time
+
+	// Admin managed
+	IsFlagged bool `gorm:"default:false"`
 }
