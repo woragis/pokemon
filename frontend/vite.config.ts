@@ -5,6 +5,11 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, './src')
+		}
+	},
 	plugins: [
 		tailwindcss(),
 		sveltekit(),
