@@ -13,6 +13,7 @@ func main() {
     routes.SetupAuthRoutes(app, db)
     routes.RegisterShoutRoutes(app)
     routes.RegisterPokeFeedRoutes(app)
+    routes.RegisterGameGuideRoutes(app)
 
     app.Listen(":3000")
 }
