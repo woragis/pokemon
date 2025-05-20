@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { fetchProfile } from "@/api/auth";
-	import { user } from "@/lib/store/user";
+	import { fetchProfile } from "$lib/api/auth";
+	import { user } from "$lib/store/user";
 	import { onMount } from "svelte";
 
 	// You can import API functions if needed

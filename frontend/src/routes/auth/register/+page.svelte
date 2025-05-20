@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { register } from '@/api/auth';
+  import { register } from '$lib/api/auth';
   import { goto } from '$app/navigation';
 
   let username = '';

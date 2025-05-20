@@ -1,5 +1,6 @@
-import type { User } from '@/lib/types';
 import { API_URL, getHeaders, setCookie } from '.';
+import type { DefaultResponse } from '../types';
+import type { User } from '../types/user';
 
 const AUTH_URL = `${API_URL}/auth`;
 
@@ -85,6 +86,6 @@ interface AuthResponse {
 	token: string;
 }
 
-interface ProfileResponse {
+interface ProfileResponse extends DefaultResponse {
 	user: User;
 }

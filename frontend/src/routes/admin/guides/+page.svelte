@@ -1,5 +1,5 @@
 <script>
-	import { deleteGuide, getGuides } from '@/api/guides.js';
+	import { deleteGuide, getGuides } from '$lib/api/guides.js';
 	let guides = getGuides();
 </script>
 

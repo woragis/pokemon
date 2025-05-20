@@ -1,5 +1,5 @@
 <script>
-	import { createGuide } from '@/api/guides.js';
+	import { createGuide } from '$lib/api/guides.js';
 
 	let title = '';
 	let category = '';

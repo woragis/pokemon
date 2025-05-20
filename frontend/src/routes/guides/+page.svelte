@@ -1,5 +1,5 @@
 <script>
-	import { getGuides } from '@/api/guides.js';
+	import { getGuides } from '$lib/api/guides.js';
 	let guides = getGuides();
 </script>
 

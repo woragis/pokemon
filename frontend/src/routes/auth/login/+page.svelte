@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { login } from '@/api/auth';
+  import { login } from '$lib/api/auth';
   import { goto } from '$app/navigation';
 
   let email = '';

@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
-  import type { BlogPost } from '$lib/types';
-  import { fetchBlogPosts } from '../../api/blog';
+  import type { BlogPost } from '$lib/types/blog';
+  import { fetchBlogPosts } from '../../lib/api/blog';
 
   let posts: BlogPost[] = [];
   let error: string | null = null;

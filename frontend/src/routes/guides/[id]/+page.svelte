@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { getGuide } from '@/api/guides.js';
+	import { getGuide } from '$lib/api/guides.js';
 
 	const guide = getGuide($page.params.id);
 </script>
