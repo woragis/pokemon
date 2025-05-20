@@ -12,6 +12,7 @@ func main() {
     db := database.ConnectDB()
     routes.SetupAuthRoutes(app, db)
     routes.RegisterShoutRoutes(app)
+    routes.RegisterPokeFeedRoutes(app)
 
     app.Listen(":3000")
 }
