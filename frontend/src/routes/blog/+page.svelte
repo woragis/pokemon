@@ -1,19 +1,34 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
-  import { getPosts } from '../../lib/api';
-	import type { BlogPost } from '$lib/types';
+  import type { BlogPost } from '$lib/types';
+  import { fetchBlogPosts } from '../../api/blog';
 
   let posts: BlogPost[] = [];
+  let error: string | null = null;
+  let loading = false;
 
-  onMount(async () => {
-    posts = await getPosts();
+  async function handleFetch() {
+    loading = true;
+    try {
+      posts = await fetchBlogPosts()
+    } catch (e: any) {
+      error = e.message;
+    } finally {
+      loading = false;
+    }
+  }
+
+  onMount(() => {
+    handleFetch();
   });
 </script>
 
 <h1>Pokémon Blog</h1>
 
-{#if posts.length === 0}
-  <p>Loading posts...</p>
+{#if loading}
+  <p>Loading blog posts...</p>
+{:else if error}
+  <p>Error: {error}</p>
 {:else}
   <ul>
     {#each posts as post}
