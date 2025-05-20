@@ -5,3 +5,8 @@ export interface BlogPost {
 	excerpt: string;
 	content: string;
 }
+
+export interface User {
+	username: string;
+	email: string;
+}
