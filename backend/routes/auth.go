@@ -5,15 +5,14 @@ import (
 	"pokemon/middleware"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func SetupAuthRoutes(app *fiber.App, db *gorm.DB) {
+func SetupAuthRoutes(app fiber.Router) {
     auth := app.Group("/auth")
     auth.Post("/register", controllers.Register)
     auth.Post("/login", controllers.Login)
 
-    app.Get("/me", middleware.Protected(), func(c *fiber.Ctx) error {
+    app.Get("/me", middleware.RequireAuth(), func(c *fiber.Ctx) error {
         userID := c.Locals("user_id")
         return c.JSON(fiber.Map{"user_id": userID})
     })

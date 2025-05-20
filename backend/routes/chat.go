@@ -8,6 +8,6 @@ import (
 	"github.com/gofiber/websocket/v2"
 )
 
-func RegisterChatRoutes(app *fiber.App, hub *ws.Hub) {
+func RegisterChatRoutes(app fiber.Router, hub *ws.Hub) {
 	app.Get("/ws/chat", websocket.New(controllers.ChatWebSocket(hub)))
 }

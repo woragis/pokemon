@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterPokeFeedRoutes(app *fiber.App) {
+func RegisterPokeFeedRoutes(app fiber.Router) {
     posts := app.Group("/pokefeed")
 
     posts.Post("/", controllers.PostPokePost)            // Create post

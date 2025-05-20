@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterAdminRoutes(app *fiber.App) {
+func RegisterAdminRoutes(app fiber.Router) {
 	admin := app.Group("/admin", middleware.RequireRole("admin", "moderator"))
 
 	admin.Get("/users", controllers.GetAllUsers)

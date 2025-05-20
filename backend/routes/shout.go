@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterShoutRoutes(app *fiber.App) {
+func RegisterShoutRoutes(app fiber.Router) {
 	shouts := app.Group("/shouts")
 
 	// Create shout

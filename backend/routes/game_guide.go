@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterGameGuideRoutes(app *fiber.App) {
+func RegisterGameGuideRoutes(app fiber.Router) {
 	guides := app.Group("/guides")
 
 	guides.Post("/", controllers.CreateGameGuide)
