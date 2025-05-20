@@ -7,12 +7,12 @@ import (
 
 type User struct {
 	gorm.Model
-	ID       uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	Username string    `gorm:"unique;not null"`
-	Name     string
-	Email    string    `gorm:"unique;not null"`
-	Password string    `gorm:"not null"`
-	Role     string    `gorm:"default:user"`
+	ID       uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Username string    `gorm:"unique;not null" json:"username"`
+	Name     string    `json:"name"`
+	Email    string    `gorm:"unique;not null" json:"email"`
+	Password string    `gorm:"not null" json:"-"`
+	Role     string    `gorm:"default:user" json:"role"`
 
 	// Trainer  Trainer   `gorm:"constraint:OnDelete:CASCADE"` // establishes relation
 }
