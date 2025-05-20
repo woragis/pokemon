@@ -97,3 +97,32 @@ func LikePokePost(c *fiber.Ctx) error {
 
     return c.JSON(fiber.Map{"message": "Post liked"})
 }
+
+func CommentOnPokePost(c *fiber.Ctx) error {
+    userID := c.Locals("user_id").(uuid.UUID)
+    postID, err := uuid.Parse(c.Params("id"))
+    if err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid post ID"})
+    }
+
+    var body struct {
+        Content string `json:"content"`
+    }
+    if err := c.BodyParser(&body); err != nil || body.Content == "" {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid content"})
+    }
+
+    comment := models.PokePostComment{
+        ID:         uuid.New(),
+        UserID:     userID,
+        PokePostID: postID,
+        Content:    body.Content,
+        CreatedAt:  time.Now(),
+    }
+
+    if err := database.DB.Create(&comment).Error; err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to comment"})
+    }
+
+    return c.JSON(comment)
+}
