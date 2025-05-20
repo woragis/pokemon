@@ -2,7 +2,21 @@ import { API_URL, getHeaders } from '.';
 
 const AUTH_URL = `${API_URL}/auth`;
 
-export async function login({ username, password }: LoginProps) {
+export async function login({ email, password }: LoginProps) {
+	try {
+		const res = await fetch(`${AUTH_URL}/login`, {
+			method: 'POST',
+			headers: getHeaders(),
+			body: JSON.stringify({ email, password })
+		});
+		if (!res.ok) throw new Error('Invalid credentials');
+		return await res.json(); // expect token or user data
+	} catch (e: any) {
+		throw new Error(e.message || 'Error logging in');
+	}
+}
+
+export async function usernameLogin({ username, password }: UsernameLoginProps) {
 	try {
 		const res = await fetch(`${AUTH_URL}/login`, {
 			method: 'POST',
@@ -31,6 +45,11 @@ export async function register({ username, email, password }: RegisterProps) {
 }
 
 interface LoginProps {
+	email: string;
+	password: string;
+}
+
+interface UsernameLoginProps {
 	username: string;
 	password: string;
 }
