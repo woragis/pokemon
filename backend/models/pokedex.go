@@ -15,25 +15,20 @@ type Game struct {
 	Description string    `gorm:"type:text"`
 }
 
-type UserPokedexEntry struct {
+type TrainerPokedexEntry struct {
 	ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 
 	TrainerID  uuid.UUID `gorm:"type:uuid;not null"`
 	GameID     uuid.UUID `gorm:"type:uuid;not null"`
 	PokemonID  uuid.UUID `gorm:"type:uuid;not null"`
 
-	Seen       bool      `gorm:"default:false"`
-	Caught     bool      `gorm:"default:false"`
-	Evolved    bool      `gorm:"default:false"`
-	Shiny      bool      `gorm:"default:false"`
-	LivingDex  bool      `gorm:"default:false"`
+	Caught          bool `gorm:"default:false"`
+	Shiny           bool `gorm:"default:false"`
+	LivingDex       bool `gorm:"default:false"`
+	ShinyLivingDex  bool `gorm:"default:false"`
 
-	Form       *string   `gorm:"type:varchar(50)"`
+	Notes      string    `gorm:"type:varchar(50)"`
 
 	UpdatedAt  time.Time
 	CreatedAt  time.Time
-
-	Trainer    Trainer          `gorm:"foreignKey:TrainerID"`
-	Game       Game             `gorm:"foreignKey:GameID"`
-	Pokemon    PokemonSpecies   `gorm:"foreignKey:PokemonID"`
 }
