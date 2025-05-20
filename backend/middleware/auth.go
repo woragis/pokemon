@@ -11,23 +11,30 @@ import (
 	"github.com/google/uuid"
 )
 
-func Protected() fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        authHeader := c.Get("Authorization")
-        if !strings.HasPrefix(authHeader, "Bearer ") {
-            return c.SendStatus(fiber.StatusUnauthorized)
-        }
+func RequireAuth() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
 
-        tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
-        token, err := utils.ParseJWT(tokenStr)
-        if err != nil || !token.Valid {
-            return c.SendStatus(fiber.StatusUnauthorized)
-        }
+		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+		token, err := utils.ParseJWT(tokenStr)
+		if err != nil || !token.Valid {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
 
-        claims := token.Claims.(jwt.MapClaims)
-        c.Locals("user_id", uint(claims["user_id"].(float64)))
-        return c.Next()
-    }
+		claims := token.Claims.(jwt.MapClaims)
+
+		userIDStr := claims["user_id"].(string)
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		c.Locals("user_id", userID)
+		return c.Next()
+	}
 }
 
 func RequireRole(roles ...string) fiber.Handler {
