@@ -110,5 +110,5 @@ func Profile(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
 
-	return c.JSON(user)
+	return c.JSON(fiber.Map{"user":user})
 }
