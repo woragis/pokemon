@@ -1,4 +1,4 @@
-import type { BlogPost } from '$lib/types';
+import type { BlogPost } from '@/lib/types';
 import { API_URL, getHeaders } from '.';
 
 const BLOG_URL = `${API_URL}/blog`;
