@@ -11,6 +11,7 @@ func main() {
     app := fiber.New()
     db := database.ConnectDB()
     routes.SetupAuthRoutes(app, db)
+    routes.RegisterShoutRoutes(app)
 
     app.Listen(":3000")
 }
