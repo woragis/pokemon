@@ -13,8 +13,5 @@ func SetupAuthRoutes(app fiber.Router) {
     auth.Post("/login", controllers.EmailLogin)
     auth.Post("/username-login", controllers.UsernameLogin)
 
-    app.Get("/me", middleware.RequireAuth(), func(c *fiber.Ctx) error {
-        userID := c.Locals("user_id")
-        return c.JSON(fiber.Map{"user_id": userID})
-    })
+    app.Get("/profile", middleware.RequireAuth(), controllers.Profile)
 }
