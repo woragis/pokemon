@@ -18,4 +18,6 @@ go get github.com/google/uuid # Uuid for database
 go get github.com/sashabaranov/go-openai # GPT AI
 go get github.com/go-resty/resty/v2 # Gemini AI
 go get github.com/stripe/stripe-go/v78 # Stripe payments
+go get github.com/gofiber/websocket/v2 # Websocket
+go get gorm.io/gorm # Postgres Gorm
 ```
