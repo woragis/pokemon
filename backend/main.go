@@ -17,6 +17,7 @@ func main() {
     routes.RegisterPokeFeedRoutes(app)
     routes.RegisterGameGuideRoutes(app)
     routes.RegisterChatRoutes(app, ws_hub)
+    routes.RegisterAdminRoutes(app)
 
     app.Listen(":3000")
 }
