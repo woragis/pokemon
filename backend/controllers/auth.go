@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/google/uuid"
 )
 
 type AuthInput struct {
@@ -99,4 +100,24 @@ func EmailLogin(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"token": token})
+}
+
+func Profile(c *fiber.Ctx) error {
+	userIDRaw := c.Locals("user_id")
+	userIDStr, ok := userIDRaw.(string)
+	if !ok {
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid UUID format")
+	}
+
+	var user models.User
+	if err := database.DB.Where("id = ?", userID).First(&user).Error; err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
+	return c.JSON(user)
 }
