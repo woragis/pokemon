@@ -25,6 +25,8 @@
     <li><a href="/">Home</a></li>
     <li><a href="/blog">Blog</a></li>
     <li><a href="/pokedex">Pokedex</a></li>
+    <li><a href="/walkthroughs">Walkthroughs</a></li>
+    <!-- <li><a href="/regions">Regions</a></li> -->
     {#if loggedIn}
       <li><a href="/profile">{username}</a></li>
       <li><button on:click={logout}>Logout</button></li>
