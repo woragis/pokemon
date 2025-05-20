@@ -31,3 +31,9 @@ type PokePostComment struct {
     Content    string    `gorm:"type:text;not null"`
     CreatedAt  time.Time
 }
+
+type UserFollow struct {
+    ID         uuid.UUID `gorm:"primaryKey"`
+    FollowerID uuid.UUID `gorm:"not null"`
+    FollowedID uuid.UUID `gorm:"not null"`
+}
