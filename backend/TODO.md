@@ -92,3 +92,79 @@ What Twitter has that your shout feature might still be missing:
     Twitter has a rich search system across all tweets.
 
     You currently only support simple feed/timeline queries.
+
+# To implement later
+
+1.  Achievements System
+
+    Track user milestones like:
+
+        Number of Pokémon caught
+
+        Living Dex completion
+
+        Number of shiny Pokémon
+
+        Participation in chats/events
+
+    Store achievements per user in Postgres.
+
+    Display badges or trophies on user profiles.
+
+2.  Friend System & Social Feed
+
+    Allow users to:
+
+        Add friends, remove friends
+
+        See friend’s recent activity: catches, achievements, posts
+
+    Social feed for posting short updates (text, images)
+
+    Notifications for friend requests, posts, likes, comments
+
+3.  Nature, Abilities & Moves Data in Pokedex
+
+    Extend PokémonSpecies model:
+
+        Nature list or default (maybe link to a nature table)
+
+        Abilities (primary, secondary, hidden)
+
+        Moves learned (by level-up, TM, egg moves)
+
+    Show these in game guide and pokedex details
+
+4.  Search & Filter
+
+    Powerful filtering/search on:
+
+        Pokémon species by name, type, region, generation
+
+        Trainer or user search by username, achievements
+
+        Feed and posts search by keywords or tags
+
+5.  Mobile App / PWA
+
+    Build a React Native or Flutter app or a PWA version of your frontend
+
+    Support push notifications for:
+
+        Friend activity
+
+        Achievements unlocked
+
+        New posts or comments
+
+    Sync with backend API you’re building
+
+6.  Localization & Multilanguage Support
+
+    Structure all frontend text and content for easy translations
+
+    Backend APIs support locale param (if applicable)
+
+    Initially support English + maybe one or two others (like Portuguese, Spanish)
+
+    Later add more languages as community grows
