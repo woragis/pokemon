@@ -4,6 +4,7 @@ export const API_URL = `${BASE_URL}/api`;
 export function getHeaders() {
 	const token = '';
 	return {
-		Authorization: `Bearer ${token}`
+		Authorization: `Bearer ${token}`,
+		'Content-Type': 'application/json'
 	};
 }
