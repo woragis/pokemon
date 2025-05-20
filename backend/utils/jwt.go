@@ -17,7 +17,7 @@ func GenerateJWT(userID uuid.UUID) (string, error) {
         "exp":     time.Now().Add(72 * time.Hour).Unix(),
     })
 
-    return token.SignedString(secret)
+    return token.SignedString([]byte(secret))
 }
 
 func ParseJWT(tokenStr string) (*jwt.Token, error) {
