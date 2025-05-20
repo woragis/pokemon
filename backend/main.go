@@ -7,6 +7,7 @@ import (
 	"pokemon/websocket"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
@@ -15,8 +16,14 @@ func main() {
 
     database.ConnectDB()
 
+    // Logging
+    app.Use(logger.New())
+
     // API Group routes
     api := app.Group("/api")
+
+    // Setup CORS for API routes
+    api.Use(middleware.SetupCors())
 
     // Public routes
     public := api.Group("/")
