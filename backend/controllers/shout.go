@@ -196,6 +196,55 @@ func Reshout(c *fiber.Ctx) error {
 	return c.JSON(shout)
 }
 
+func GetInfiniteFeed(c *fiber.Ctx) error {
+	cursor := c.Query("cursor")
+	pageSize := 20
+
+	var shouts []models.Shout
+	query := database.DB.Preload("User").Order("created_at desc").Limit(pageSize)
+
+	if cursor != "" {
+		parsedTime, err := time.Parse(time.RFC3339, cursor)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Invalid cursor format")
+		}
+		query = query.Where("created_at < ?", parsedTime)
+	}
+
+	if err := query.Find(&shouts).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return c.JSON(shouts)
+}
+
+func DeleteReshout(c *fiber.Ctx) error {
+	userID := c.Locals("user_id").(uuid.UUID)
+	shoutID, err := parseUUIDParam(c, "id")
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid shout ID")
+	}
+
+	var shout models.Shout
+	if err := database.DB.First(&shout, "id = ?", shoutID).Error; err != nil {
+		return fiber.ErrNotFound
+	}
+
+	if shout.UserID != userID {
+		return fiber.NewError(fiber.StatusForbidden, "Not your shout")
+	}
+
+	if shout.ReshoutOfID == nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Not a reshout")
+	}
+
+	if err := database.DB.Delete(&shout).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return c.JSON(fiber.Map{"message": "Reshout deleted"})
+}
+
 // // AI-generated reply (just a mocked example)
 // func AIReplyToShout(c *fiber.Ctx) error {
 // 	userID := c.Locals("userID").(uint)
