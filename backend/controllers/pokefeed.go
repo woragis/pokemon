@@ -126,3 +126,18 @@ func CommentOnPokePost(c *fiber.Ctx) error {
 
     return c.JSON(comment)
 }
+
+func UnlikePokePost(c *fiber.Ctx) error {
+    userID := c.Locals("user_id").(uuid.UUID)
+    postID, err := uuid.Parse(c.Params("id"))
+    if err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid post ID"})
+    }
+
+    if err := database.DB.Where("user_id = ? AND poke_post_id = ?", userID, postID).
+        Delete(&models.PokePostLike{}).Error; err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to unlike post"})
+    }
+
+    return c.JSON(fiber.Map{"message": "Post unliked"})
+}
