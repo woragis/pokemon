@@ -103,16 +103,7 @@ func EmailLogin(c *fiber.Ctx) error {
 }
 
 func Profile(c *fiber.Ctx) error {
-	userIDRaw := c.Locals("user_id")
-	userIDStr, ok := userIDRaw.(string)
-	if !ok {
-		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
-	}
-
-	userID, err := uuid.Parse(userIDStr)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid UUID format")
-	}
+	userID := c.Locals("user_id").(uuid.UUID)
 
 	var user models.User
 	if err := database.DB.Where("id = ?", userID).First(&user).Error; err != nil {
