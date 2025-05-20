@@ -10,7 +10,8 @@ import (
 func SetupAuthRoutes(app fiber.Router) {
     auth := app.Group("/auth")
     auth.Post("/register", controllers.Register)
-    auth.Post("/login", controllers.Login)
+    auth.Post("/login", controllers.EmailLogin)
+    auth.Post("/username-login", controllers.UsernameLogin)
 
     app.Get("/me", middleware.RequireAuth(), func(c *fiber.Ctx) error {
         userID := c.Locals("user_id")
