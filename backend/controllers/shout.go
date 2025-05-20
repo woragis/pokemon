@@ -269,3 +269,11 @@ func DeleteReshout(c *fiber.Ctx) error {
 
 // 	return c.JSON(reply)
 // }
+
+func FlagShout(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if err := database.DB.Model(&models.Shout{}).Where("id = ?", id).Update("is_flagged", true).Error; err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	return c.JSON(fiber.Map{"message": "Shout flagged for review"})
+}
