@@ -81,6 +81,8 @@ func GetUserPokePosts(c *fiber.Ctx) error {
 func LikePokePost(c *fiber.Ctx) error {
     userID := c.Locals("user_id").(uuid.UUID)
     postID, err := uuid.Parse(c.Params("id"))
+
+
     if err != nil {
         return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid post ID"})
     }
@@ -94,6 +96,13 @@ func LikePokePost(c *fiber.Ctx) error {
     if err := database.DB.Create(&like).Error; err != nil {
         return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to like post"})
     }
+
+	// Notification
+	var post models.PokePost
+	_ = database.DB.First(&post, "id = ?", postID)
+	if post.UserID != userID {
+		CreateNotification(post.UserID, "like", "Your post got a like!")
+	}
 
     return c.JSON(fiber.Map{"message": "Post liked"})
 }
@@ -123,6 +132,14 @@ func CommentOnPokePost(c *fiber.Ctx) error {
     if err := database.DB.Create(&comment).Error; err != nil {
         return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to comment"})
     }
+
+	// Notification
+	var post models.PokePost
+	_ = database.DB.First(&post, "id = ?", postID)
+	if post.UserID != userID {
+		CreateNotification(post.UserID, "comment", "Someone commented on your post!")
+	}
+
 
     return c.JSON(comment)
 }
