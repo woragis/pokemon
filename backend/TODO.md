@@ -1,5 +1,20 @@
 # Features
 
+## Game Guide
+
+1.  Search guides by keyword or tag
+2.  Featured guides on homepage
+3.  Markdown support (rendered content)
+4.  Admin-only create/edit permissions
+5.  User comments or reactions to guides
+6.  Save/bookmark guides
+
+### Main
+
+- Markdown preview
+- Search
+- Admin only protection
+
 ## Shouts
 
 What Twitter has that your shout feature might still be missing:
