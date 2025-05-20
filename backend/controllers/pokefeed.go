@@ -141,3 +141,38 @@ func UnlikePokePost(c *fiber.Ctx) error {
 
     return c.JSON(fiber.Map{"message": "Post unliked"})
 }
+
+func FollowTrainer(c *fiber.Ctx) error {
+    followerID := c.Locals("user_id").(uuid.UUID)
+    followedID, err := uuid.Parse(c.Params("id"))
+    if err != nil || followerID == followedID {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid follow"})
+    }
+
+    follow := models.UserFollow{
+        ID:         uuid.New(),
+        FollowerID: followerID,
+        FollowedID: followedID,
+    }
+
+    if err := database.DB.Create(&follow).Error; err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to follow"})
+    }
+
+    return c.JSON(fiber.Map{"message": "Followed"})
+}
+
+func UnfollowTrainer(c *fiber.Ctx) error {
+    followerID := c.Locals("user_id").(uuid.UUID)
+    followedID, err := uuid.Parse(c.Params("id"))
+    if err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid unfollow"})
+    }
+
+    if err := database.DB.Where("follower_id = ? AND followed_id = ?", followerID, followedID).
+        Delete(&models.UserFollow{}).Error; err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to unfollow"})
+    }
+
+    return c.JSON(fiber.Map{"message": "Unfollowed"})
+}
