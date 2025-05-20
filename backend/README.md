@@ -21,3 +21,29 @@ go get github.com/stripe/stripe-go/v78 # Stripe payments
 go get github.com/gofiber/websocket/v2 # Websocket
 go get gorm.io/gorm # Postgres Gorm
 ```
+
+## Pokedex
+
+### Planning
+
+```js
+PostgreSQL (Relational)
+├── trainers
+├── games
+├── pokemon_species
+├── user_pokedex_progress
+└── user_game_completion (optional for living/shiny/etc metrics)
+
+MongoDB (Flexible)
+└── user_journeys
+    └── [
+          {
+            trainer_id: "abc123",
+            game: "Platinum",
+            type: "achievement" | "todo" | "strategy",
+            content: "...",
+            tags: ["team building", "elite4"],
+            created_at: ...
+          }
+        ]
+```
