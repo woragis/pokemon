@@ -8,4 +8,5 @@ type User struct {
     Name     string `gorm:"null"`
     Email    string `gorm:"unique;not null"`
     Password string `gorm:"not null"`
+    Role     string `gorm:"default:user"` // "user", "moderator", "admin"
 }
