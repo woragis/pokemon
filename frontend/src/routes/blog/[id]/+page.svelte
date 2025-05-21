@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { ArrowLeft, Save } from 'lucide-svelte';
-	import { marked } from 'marked';
+	import { fetchBlogPostById } from '$lib/api/blog';
 
-	export let postId: string | undefined = undefined;
+	export let id: string | undefined = undefined;
 
+	let error = '';
 	let post = {
 		title: '',
 		content: '',
@@ -12,49 +13,30 @@
 	};
 
 	let loading = false;
-	const isEditing = !postId;
+	const isEditing = !id;
 
-	onMount(() => {
-		if (postId) fetchPost();
-	});
+	async function handleFetch() {
+		try {
+			if (id) {
+				post = await fetchBlogPostById({ id });
+			}
+		} catch (err) {
+			error = '';
+		}
+	}
 
-	const fetchPost = async () => {
-		// const { data, error } = await supabase
-		//   .from('blog_posts')
-		//   .select(`*, author:profiles(username)`)
-		//   .eq('id', postId)
-		//   .single()
-		// if (error) {
-		//   console.error('Error fetching post:', error)
-		//   return
-		// }
-		// post = data
-	};
-
-	const handleSubmit = async () => {
+	const handleEdit = async () => {
 		loading = true;
 		try {
-			// const { data: { user } } = await supabase.auth.getUser()
-			// if (!user) {
-			//   window.location.href = '/auth'
-			//   return
-			// }
-			// const { error } = await supabase.from('blog_posts').insert([
-			//   {
-			//     title: post.title,
-			//     content: post.content,
-			//     author_id: user.id,
-			//     published: post.published,
-			//   },
-			// ])
-			// if (error) throw error
-			// window.location.href = '/blog'
+			// await putBlogPost({id, blog: post})
 		} catch (error) {
-			console.error('Error saving post:', error);
+			console.error('Error editing post:', error);
 		} finally {
 			loading = false;
 		}
 	};
+
+	onMount(handleFetch);
 </script>
 
 <div class="min-h-screen bg-gray-50 pt-16">
@@ -70,7 +52,7 @@
 			{#if isEditing}
 				<div class="rounded-lg bg-white p-6 shadow-md">
 					<h1 class="mb-6 text-2xl font-bold text-gray-900">Create New Post</h1>
-					<form on:submit|preventDefault={handleSubmit}>
+					<form on:submit|preventDefault={handleEdit}>
 						<div class="mb-4">
 							<label class="mb-1 block text-sm font-medium text-gray-700">Title</label>
 							<input
