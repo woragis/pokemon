@@ -32,6 +32,7 @@ func main() {
     routes.RegisterChatRoutes(api, ws_hub)
     routes.RegisterPokedexRoutes(api)
     routes.BlogRoutes(api)
+    routes.SetupGameRoutes(api)
 
     app.Listen(":3000")
 }

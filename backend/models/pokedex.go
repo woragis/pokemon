@@ -6,15 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type Game struct {
-	ID          uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	Name        string    `gorm:"unique;not null"`
-	Region      string    `gorm:"not null"`       // e.g., "Kanto", "Hoenn"
-	Generation  int       `gorm:"not null"`       // e.g., 1, 2, 3, etc.
-	ReleasedAt  string    `gorm:"not null"`       // ISO or "YYYY-MM-DD"
-	Description string    `gorm:"type:text"`
-}
-
 type TrainerPokedexEntry struct {
 	ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 
