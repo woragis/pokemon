@@ -32,6 +32,7 @@ func ConnectDB() *gorm.DB {
         &models.PokePostComment{},
         &models.PokePostLike{},
         &models.PokemonSpecies{},
+        &models.PokemonGame{},
         &models.Shout{},
         &models.ShoutComment{},
         &models.ShoutLike{},

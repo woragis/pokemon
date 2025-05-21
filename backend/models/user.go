@@ -1,20 +1,28 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
-	ID       uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	Username string    `gorm:"unique;not null" json:"username"`
-	Name     string    `json:"name"`
-	Email    string    `gorm:"unique;not null" json:"email"`
-	Password string    `gorm:"not null" json:"-"`
-	Role     string    `gorm:"default:user" json:"role"`
+	ID       uuid.UUID         `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Username string            `gorm:"unique;not null" json:"username"`
+	Name     string            `json:"name"`
+	Email    string            `gorm:"unique;not null" json:"email"`
+	Password string            `gorm:"not null" json:"-"`
+	Role     string            `gorm:"default:user" json:"role"`
 
-	// Trainer  Trainer   `gorm:"constraint:OnDelete:CASCADE"` // establishes relation
+	FavoritePokemon string     `json:"favorite_pokemon"`
+
+	FavoriteGameID uuid.UUID   `gorm:"type:uuid" json:"favorite_game_id"`
+	FavoriteGame   PokemonGame `gorm:"foreignKey:FavoriteGameID" json:"favorite_game"`
+
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt time.Time        `json:"updated_at"`
+	DeletedAt gorm.DeletedAt   `gorm:"index" json:"deleted_at,omitempty"`
 }
 
 type Trainer struct {

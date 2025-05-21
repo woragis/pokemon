@@ -13,3 +13,8 @@ type PokemonSpecies struct {
 	BaseEvolution string  `gorm:"default:null"`     // "Bulbasaur"
 	FinalEvolution string `gorm:"default:null"`     // "Venusaur"
 }
+
+type PokemonGame struct {
+	ID   uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Name string    `gorm:"unique;not null" json:"name"`
+}
