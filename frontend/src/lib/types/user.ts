@@ -1,3 +1,5 @@
+import type { PokemonGame } from './games';
+
 export interface User {
 	id: string;
 	username: string;
@@ -11,9 +13,4 @@ export interface User {
 	created_at: string;
 	updated_at: string;
 	deleted_at: string;
-}
-
-interface PokemonGame {
-	id: string;
-	name: string;
 }
