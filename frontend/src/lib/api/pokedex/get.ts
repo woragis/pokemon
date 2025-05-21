@@ -1,4 +1,4 @@
-import { pokemons, total } from '$lib/store/pokemons';
+import { pokemons } from '$lib/store/pokemons';
 import type { PokemonData } from '$lib/types/pokeapi';
 import { POKEMONS_POKEAPI } from '.';
 
@@ -21,7 +21,6 @@ export async function fetchAllPokemons({ offset = 0, limit = 100 }: Pagination) 
 		const res = await fetch(`${POKEMONS_POKEAPI}?offset=${offset}&limit=${limit}`);
 		if (!res.ok) throw new Error('Failed to fetch Pokémon list');
 		const response: AllPokemonsResponse = await res.json();
-		total.set(response.count);
 
 		const details = await Promise.all(
 			response.results.map(async (pokemon) => {
