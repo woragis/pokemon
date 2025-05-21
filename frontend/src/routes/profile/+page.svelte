@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { User, Edit2, Save } from 'lucide-svelte';
-	import { fetchProfile } from '$lib/api/auth';
-	import { putProfile } from '$lib/api/auth/put';
+	import { fetchProfile, putProfile } from '$lib/api/profile';
 	import { user } from '$lib/store/user';
 	import type { PokemonGame } from '$lib/types/games';
 	import { fetchGames } from '$lib/api/games';
