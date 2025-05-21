@@ -5,8 +5,7 @@ export interface AuthResponse {
 	token: string;
 }
 
-import { fetchProfile } from './get';
 import { login, usernameLogin } from './login';
 import { register } from './register';
 
-export { fetchProfile, login, usernameLogin, register };
+export { login, usernameLogin, register };

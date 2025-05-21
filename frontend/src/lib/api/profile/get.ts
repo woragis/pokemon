@@ -1,15 +1,10 @@
 import { setUser } from '$lib/store/user';
-import type { DefaultResponse } from '$lib/types';
-import type { User } from '$lib/types/user';
-import { API_URL, getHeaders } from '..';
-
-interface ProfileResponse extends DefaultResponse {
-	user: User;
-}
+import { PROFILE_URL, type ProfileResponse } from '.';
+import { getHeaders } from '..';
 
 export async function fetchProfile() {
 	try {
-		const res = await fetch(`${API_URL}/profile`, {
+		const res = await fetch(`${PROFILE_URL}/`, {
 			headers: getHeaders()
 		});
 		if (!res.ok) throw new Error('Registration failed');
