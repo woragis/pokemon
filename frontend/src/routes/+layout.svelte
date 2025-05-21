@@ -7,11 +7,13 @@
 	let { children } = $props();
 </script>
 
-<Navbar />
-<main id="main-content">
-{@render children()}
-</main>
-<Footer />
+<div class="flex min-h-screen flex-col">
+	<Navbar />
+	<main id="main-content" class="flex-grow pt-16">
+		{@render children()}
+	</main>
+	<Footer />
+</div>
 
 <style>
 	#main-content {
