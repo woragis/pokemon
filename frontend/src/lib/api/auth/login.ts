@@ -10,6 +10,7 @@ interface UsernameLoginProps {
 	username: string;
 	password: string;
 }
+
 export async function login({ email, password }: LoginProps) {
 	try {
 		const res = await fetch(`${AUTH_URL}/login`, {
