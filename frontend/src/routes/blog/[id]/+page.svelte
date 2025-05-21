@@ -1,8 +1,7 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { getPostById } from '../../../lib/api';
-	import type { BlogPost } from '$lib/types';
+	import type { BlogPost } from '$lib/types/blog';
 
   let post: BlogPost | undefined;
   let id;
@@ -10,7 +9,7 @@
   $: id = $page.params.id;
 
   onMount(async () => {
-    post = await getPostById(id);
+    // post = await getPostById(id);
   });
 </script>
 

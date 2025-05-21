@@ -1,8 +1,8 @@
 <script>
-	import Cta from '$lib/components/CTA.svelte';
-  import Features from '$lib/components/Features.svelte';
-  import Hero from '$lib/components/Hero.svelte';
-	import News from '$lib/components/News.svelte';
+	import Cta from '$lib/components/Home/CTA.svelte';
+  import Features from '$lib/components/Home/Features.svelte';
+  import Hero from '$lib/components/Home/Hero.svelte';
+	import News from '$lib/components/Home/News.svelte';
 
   const featuredGuides = [
     { title: "How to Beat Elite Four", link: "#" },
