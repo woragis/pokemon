@@ -1,13 +1,9 @@
 <script lang="ts">
 	import { fetchAllPokemons } from '$lib/api/pokedex';
-	import type { Pagination } from '$lib/api/pokedex/get';
 	import PokedexGrid from '$lib/components/pokemon/PokedexGrid.svelte';
-	import { pokemons, total } from '$lib/store/pokemons';
+	import { pagination, pokemons, total } from '$lib/store/pokemons';
 	import { Search } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
-
-	const pagination = writable<Pagination>({ offset: 0, limit: 20 });
 
 	function nextPage() {
 		pagination.update((p) => {
