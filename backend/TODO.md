@@ -168,3 +168,7 @@ What Twitter has that your shout feature might still be missing:
     Initially support English + maybe one or two others (like Portuguese, Spanish)
 
     Later add more languages as community grows
+
+## Blog
+
+Everything
