@@ -35,11 +35,6 @@
 	export function capitalize(str: string): string {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
-	async function getPokemonData(url: string) {
-		try {
-			const data = await fetch(url);
-		} catch (err) {}
-	}
 </script>
 
 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

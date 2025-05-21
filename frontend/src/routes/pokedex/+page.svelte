@@ -6,31 +6,18 @@
 	import { Search } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
-	function nextPage() {
-		pagination.update((p) => {
-			const next = p.offset + p.limit;
-			return { ...p, offset: next };
+	let loading = false;
+
+	$: {
+		const { offset, limit } = $pagination;
+		loading = true;
+		fetchAllPokemons({ offset, limit }).then(() => {
+			loading = false;
 		});
-		loadPage();
 	}
-
-	function prevPage() {
-		pagination.update((p) => {
-			const prev = Math.max(p.offset - p.limit, 0);
-			return { ...p, offset: prev };
-		});
-		loadPage();
-	}
-
-	const loadPage = async () => {
-		const $pagination = get(pagination);
-		await fetchAllPokemons($pagination);
-	};
-
-	import { get } from 'svelte/store';
 
 	onMount(() => {
-		loadPage();
+		fetchAllPokemons($pagination);
 	});
 </script>
 
@@ -84,5 +71,5 @@
 
 	<PokedexGrid pokemons={$pokemons} />
 
-	<PokedexNav total={$total} />
+	<PokedexNav />
 </div>
