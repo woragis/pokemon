@@ -25,22 +25,13 @@ func main() {
     // Setup CORS for API routes
     api.Use(middleware.SetupCors())
 
-    // Public routes
-    public := api.Group("/")
-    routes.SetupAuthRoutes(public)
-
-    // Logged in routes
-    auth := api.Group("/", middleware.RequireAuth())
-    routes.RegisterShoutRoutes(auth)
-    routes.RegisterPokeFeedRoutes(auth)
-    routes.RegisterGameGuideRoutes(auth)
-    routes.RegisterChatRoutes(auth, ws_hub)
-    routes.RegisterPokedexRoutes(auth)
-    routes.BlogRoutes(auth)
-
-    // Admin routes
-    admin := api.Group("/admin", middleware.RequireAuth(), middleware.RequireRole())
-    routes.RegisterAdminRoutes(admin)
+    routes.SetupAuthRoutes(api)
+    routes.RegisterShoutRoutes(api)
+    routes.RegisterPokeFeedRoutes(api)
+    routes.RegisterGameGuideRoutes(api)
+    routes.RegisterChatRoutes(api, ws_hub)
+    routes.RegisterPokedexRoutes(api)
+    routes.BlogRoutes(api)
 
     app.Listen(":3000")
 }

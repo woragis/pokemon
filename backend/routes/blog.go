@@ -2,16 +2,19 @@ package routes
 
 import (
 	"pokemon/controllers"
+	"pokemon/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func BlogRoutes(app fiber.Router) {
-	blog := app.Group("/blog")
+func BlogRoutes(api fiber.Router) {
+	blog := api.Group("/blog")
 
 	blog.Get("/", controllers.GetBlogPosts)         // GET all
 	blog.Get("/:id", controllers.GetBlogPost)       // GET by ID
-	blog.Post("/", controllers.CreateBlogPost)      // POST new
-	blog.Put("/:id", controllers.UpdateBlogPost)    // PUT update
-	blog.Delete("/:id", controllers.DeleteBlogPost) // DELETE
+
+	writers := blog.Group("/", middleware.RequireAuth(), middleware.RequireRole(ContentManagerRoles...))
+	writers.Post("/", controllers.CreateBlogPost)      // POST new
+	writers.Put("/:id", controllers.UpdateBlogPost)    // PUT update
+	writers.Delete("/:id", controllers.DeleteBlogPost) // DELETE
 }

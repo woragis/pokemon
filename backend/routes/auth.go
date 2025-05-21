@@ -7,11 +7,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupAuthRoutes(app fiber.Router) {
-    auth := app.Group("/auth")
+func SetupAuthRoutes(api fiber.Router) {
+    auth := api.Group("/auth")
     auth.Post("/register", controllers.Register)
     auth.Post("/login", controllers.EmailLogin)
     auth.Post("/username-login", controllers.UsernameLogin)
 
-    app.Get("/profile", middleware.RequireAuth(), controllers.Profile)
+    api.Get("/profile", middleware.RequireAuth(), controllers.Profile)
+ 
+    admin := api.Group("/admin", middleware.RequireAuth(), middleware.RequireRole("admin", "moderator"))
+	admin.Get("/users", controllers.GetAllUsers)
+	admin.Patch("/users/:id/ban", controllers.BanUser)
 }

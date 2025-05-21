@@ -2,22 +2,25 @@ package routes
 
 import (
 	"pokemon/controllers"
+	"pokemon/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterPokeFeedRoutes(app fiber.Router) {
-    posts := app.Group("/pokefeed")
+func RegisterPokeFeedRoutes(api fiber.Router) {
+    posts := api.Group("/pokefeed")
 
-    posts.Post("/", controllers.PostPokePost)            // Create post
     posts.Get("/", controllers.GetPokeFeed)              // Get feed (paginated)
     posts.Get("/user/:id", controllers.GetUserPokePosts) // Get user posts
-    posts.Post("/:id/like", controllers.LikePokePost)    // Like post
-    posts.Post("/:id/comment", controllers.CommentOnPokePost)
 
-    posts.Post("/:id/unlike", controllers.UnlikePokePost)
+    userPosts := posts.Group("/", middleware.RequireAuth())
+    userPosts.Post("/", controllers.PostPokePost)            // Create post
+    userPosts.Post("/:id/like", controllers.LikePokePost)    // Like post
+    userPosts.Post("/:id/comment", controllers.CommentOnPokePost)
+    userPosts.Post("/:id/unlike", controllers.UnlikePokePost)
 
-    users := app.Group("/trainers")
+    // Review to see if they would be in this scope
+    users := api.Group("/trainers", middleware.RequireAuth())
 
     users.Post("/:id/follow", controllers.FollowTrainer)
     users.Post("/:id/unfollow", controllers.UnfollowTrainer)
