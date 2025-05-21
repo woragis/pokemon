@@ -7,7 +7,7 @@ import (
 )
 
 type Shout struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID       uuid.UUID      `gorm:"type:uuid;not null;index"`
 	User         User           `gorm:"foreignKey:UserID"`
 
@@ -33,7 +33,7 @@ type Shout struct {
 }
 
 type ShoutLike struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID    uuid.UUID `gorm:"type:uuid;not null;index"`
 	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index"`
 
@@ -43,7 +43,7 @@ type ShoutLike struct {
 }
 
 type ShoutComment struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID    uuid.UUID `gorm:"type:uuid;not null;index"`
 	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index"`
 	Content   string    `gorm:"type:text;not null"`
