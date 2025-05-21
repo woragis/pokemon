@@ -1,5 +1,17 @@
 <script>
 	import { Github, Instagram, Twitter } from 'lucide-svelte';
+
+	const githubUrl = 'https://github.com/woragis/pokemon';
+	const twitterUrl = 'https://twitter.com/woragis';
+	const instagramUrl = 'https://instagram.com/woragis';
+	const documentationUrl = '';
+	const tutorialsUrl = '';
+	const guidesUrl = '';
+	const faqUrl = '';
+	const termsUrl = '';
+	const privacyUrl = '';
+	const copyrightUrl = '';
+	const cookiesUrl = '';
 </script>
 
 <footer class="bg-gray-800 pb-8 pt-12 text-white">
@@ -16,13 +28,13 @@
 					Your ultimate Pokémon companion for tracking, team building, and community discussions.
 				</p>
 				<div class="flex space-x-4">
-					<a href="#" class="text-gray-300 transition-colors hover:text-white">
+					<a href={githubUrl} class="text-gray-300 transition-colors hover:text-white">
 						<Github size="20" />
 					</a>
-					<a href="#" class="text-gray-300 transition-colors hover:text-white">
+					<a href={twitterUrl} class="text-gray-300 transition-colors hover:text-white">
 						<Twitter size="20" />
 					</a>
-					<a href="#" class="text-gray-300 transition-colors hover:text-white">
+					<a href={instagramUrl} class="text-gray-300 transition-colors hover:text-white">
 						<Instagram size="20" />
 					</a>
 				</div>
@@ -55,15 +67,22 @@
 				<h3 class="mb-4 text-lg font-semibold text-white">Resources</h3>
 				<ul class="space-y-2">
 					<li>
-						<a href="#" class="text-gray-300 transition-colors hover:text-red-300"
+						<a href={documentationUrl} class="text-gray-300 transition-colors hover:text-red-300"
 							>API Documentation</a
 						>
 					</li>
 					<li>
-						<a href="#" class="text-gray-300 transition-colors hover:text-red-300">Tutorials</a>
+						<a href={tutorialsUrl} class="text-gray-300 transition-colors hover:text-red-300"
+							>Tutorials</a
+						>
 					</li>
-					<li><a href="#" class="text-gray-300 transition-colors hover:text-red-300">Guides</a></li>
-					<li><a href="#" class="text-gray-300 transition-colors hover:text-red-300">FAQ</a></li>
+					<li>
+						<a href={guidesUrl} class="text-gray-300 transition-colors hover:text-red-300">Guides</a
+						>
+					</li>
+					<li>
+						<a href={faqUrl} class="text-gray-300 transition-colors hover:text-red-300">FAQ</a>
+					</li>
 				</ul>
 			</div>
 
@@ -71,19 +90,24 @@
 				<h3 class="mb-4 text-lg font-semibold text-white">Legal</h3>
 				<ul class="space-y-2">
 					<li>
-						<a href="#" class="text-gray-300 transition-colors hover:text-red-300"
+						<a href={termsUrl} class="text-gray-300 transition-colors hover:text-red-300"
 							>Terms of Service</a
 						>
 					</li>
 					<li>
-						<a href="#" class="text-gray-300 transition-colors hover:text-red-300">Privacy Policy</a
+						<a href={privacyUrl} class="text-gray-300 transition-colors hover:text-red-300"
+							>Privacy Policy</a
 						>
 					</li>
 					<li>
-						<a href="#" class="text-gray-300 transition-colors hover:text-red-300">Cookie Policy</a>
+						<a href={cookiesUrl} class="text-gray-300 transition-colors hover:text-red-300"
+							>Cookie Policy</a
+						>
 					</li>
 					<li>
-						<a href="#" class="text-gray-300 transition-colors hover:text-red-300">Copyright</a>
+						<a href={copyrightUrl} class="text-gray-300 transition-colors hover:text-red-300"
+							>Copyright</a
+						>
 					</li>
 				</ul>
 			</div>
