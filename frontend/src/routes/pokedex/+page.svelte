@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fetchAllPokemons } from '$lib/api/pokedex';
+	import PokedexNav from '$lib/components/pokedex/PokedexNav.svelte';
 	import PokedexGrid from '$lib/components/pokemon/PokedexGrid.svelte';
 	import { pagination, pokemons, total } from '$lib/store/pokemons';
 	import { Search } from 'lucide-svelte';
@@ -83,29 +84,5 @@
 
 	<PokedexGrid pokemons={$pokemons} />
 
-	<div class="mt-12 flex justify-center">
-		<nav class="flex items-center gap-2">
-			<button
-				on:click={prevPage}
-				class="flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-300 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-				disabled={$pagination.offset === 0}
-			>
-				<span>←</span>
-				<span>Previous</span>
-			</button>
-
-			<span class="rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white shadow">
-				Page {$pagination.offset / $pagination.limit + 1}
-			</span>
-
-			<button
-				on:click={nextPage}
-				class="flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-300 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-				disabled={$pagination.offset + $pagination.limit >= $total}
-			>
-				<span>Next</span>
-				<span>→</span>
-			</button>
-		</nav>
-	</div>
+	<PokedexNav total={$total} />
 </div>
