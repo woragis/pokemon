@@ -36,6 +36,7 @@ func main() {
     routes.RegisterGameGuideRoutes(auth)
     routes.RegisterChatRoutes(auth, ws_hub)
     routes.RegisterPokedexRoutes(auth)
+    routes.BlogRoutes(auth)
 
     // Admin routes
     admin := api.Group("/admin", middleware.RequireAuth(), middleware.RequireRole())
