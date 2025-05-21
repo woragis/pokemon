@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { BlogPost } from '$lib/types/blog';
 	import { fetchBlogPosts } from '../../lib/api/blog';
+	import { Clock, PenSquare, User } from 'lucide-svelte';
 
 	let posts: BlogPost[] = [];
 	let error: string | null = null;
@@ -54,6 +55,7 @@
 				href="/blog/new"
 				class="flex items-center rounded-lg bg-white px-6 py-3 font-semibold text-blue-600 transition-colors hover:bg-blue-50"
 			>
+				<PenSquare class="mr-1 h-4 w-4" />
 				Write New Post
 			</a>
 		</div>
@@ -67,7 +69,12 @@
 				<div class="p-6">
 					<h2 class="mb-2 text-xl font-bold text-gray-900">{post.title}</h2>
 					<p class="mb-4 text-gray-600">{post.content.slice(0, 150)}...</p>
-					<div class="mb-4 flex items-center text-sm text-gray-500"></div>
+					<div class="mb-4 flex items-center text-sm text-gray-500">
+						<User class="mr-1 h-4 w-4" />
+						<!-- <span class="mr-4">{post.author.username}</span> -->
+						<Clock class="mr-1 h-4 w-4" />
+						<!-- <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span> -->
+					</div>
 					<a
 						href={`/blog/${post.id}`}
 						class="font-medium text-blue-600 transition-colors hover:text-blue-800">Read More →</a
