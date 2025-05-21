@@ -21,7 +21,25 @@ func ConnectDB() *gorm.DB {
         log.Fatalf("Failed to connect to database: %v", err)
     }
 
-    err = db.AutoMigrate(&models.User{})
+    err = db.AutoMigrate(
+        &models.BlogPost{},
+        &models.ChatMessage{},
+        &models.Game{},
+        &models.GameGuide{},
+        &models.GameGuideTag{},
+        &models.Notification{},
+        &models.PokePost{},
+        &models.PokePostComment{},
+        &models.PokePostLike{},
+        &models.PokemonSpecies{},
+        &models.Shout{},
+        &models.ShoutComment{},
+        &models.ShoutLike{},
+        &models.Trainer{},
+        &models.TrainerPokedexEntry{},
+        &models.User{},
+        &models.UserFollow{},
+    )
     if err != nil {
         log.Fatalf("Failed to run migrations: %v", err)
     }
