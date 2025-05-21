@@ -1,8 +1,5 @@
-import { API_URL, getHeaders } from '.';
-import type { DefaultResponse } from '../types';
-import type { PokedexPokemon } from '../types/pokemon';
-
-const POKEDEX_URL = `${API_URL}/pokedex`;
+import { POKEDEX_URL, type PokedexResponse } from '.';
+import { getHeaders } from '..';
 
 export async function fetchPokedex() {
 	try {
@@ -14,8 +11,4 @@ export async function fetchPokedex() {
 	} catch (e: any) {
 		throw new Error('Error fetching pokedex');
 	}
-}
-
-interface PokedexResponse extends DefaultResponse {
-	pokemons: PokedexPokemon[];
 }
