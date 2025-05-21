@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"pokemon/config"
 	"pokemon/controllers"
 	"pokemon/middleware"
 
@@ -13,7 +14,7 @@ func RegisterGameGuideRoutes(api fiber.Router) {
 	guides.Get("/", controllers.ListGameGuides)
 	guides.Get("/:slug", controllers.GetGameGuide)
 
-	admin := guides.Group("/", middleware.RequireAuth(), middleware.RequireRole(ContentManagerRoles...))
+	admin := guides.Group("/", middleware.RequireAuth(), middleware.RequireRole(config.Writers...))
 	admin.Post("/", controllers.CreateGameGuide)
 	admin.Put("/:slug", controllers.UpdateGameGuide)
 }

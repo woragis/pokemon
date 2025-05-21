@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"pokemon/config"
 	"pokemon/controllers"
 	"pokemon/middleware"
 
@@ -32,7 +33,7 @@ func RegisterShoutRoutes(api fiber.Router) {
 
 	// (Optional) AI reply
 	// shouts.Post("/:id/ai-reply", controllers.AIReplyToShout)
-	admin := api.Group("/admin", middleware.RequireRole(), middleware.RequireRole("admin", "moderator"))
+	admin := api.Group("/admin", middleware.RequireRole(), middleware.RequireRole(config.Moderators...))
 
 	// New shout moderation routes
 	admin.Get("/shouts", controllers.ModerateShouts)

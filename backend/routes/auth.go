@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"pokemon/config"
 	"pokemon/controllers"
 	"pokemon/middleware"
 
@@ -15,7 +16,7 @@ func SetupAuthRoutes(api fiber.Router) {
 
     api.Get("/profile", middleware.RequireAuth(), controllers.Profile)
  
-    admin := api.Group("/admin", middleware.RequireAuth(), middleware.RequireRole("admin", "moderator"))
+    admin := api.Group("/admin", middleware.RequireAuth(), middleware.RequireRole(config.Admins...))
 	admin.Get("/users", controllers.GetAllUsers)
 	admin.Patch("/users/:id/ban", controllers.BanUser)
 }
