@@ -15,10 +15,10 @@
 		PersonStanding
 	} from 'lucide-svelte';
 	import Link from './common/Link.svelte';
+	import { user } from '$lib/store/user';
 
 	let isMenuOpen = false;
 	let isScrolled = false;
-	let user = null;
 
 	onMount(() => {
 		const handleScroll = () => {
@@ -73,7 +73,7 @@
 					<Search class="h-5 w-5 text-gray-600" />
 				</button>
 
-				{#if user}
+				{#if $user}
 					<div class="group relative">
 						<a href="/profile" class="rounded-full p-2 transition-colors hover:bg-gray-100">
 							<User class="h-5 w-5 text-gray-600" />
@@ -92,7 +92,7 @@
 						</div>
 					</div>
 				{:else}
-					<a href="/auth" class="rounded-full p-2 transition-colors hover:bg-gray-100">
+					<a href="/auth/login" class="rounded-full p-2 transition-colors hover:bg-gray-100">
 						<User class="h-5 w-5 text-gray-600" />
 					</a>
 				{/if}
