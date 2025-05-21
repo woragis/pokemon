@@ -1,14 +1,40 @@
-<script>
+<script lang="ts">
+	import { fetchAllPokemons } from '$lib/api/pokedex';
+	import type { Pagination } from '$lib/api/pokedex/get';
 	import PokedexGrid from '$lib/components/pokemon/PokedexGrid.svelte';
+	import { pokemons, total } from '$lib/store/pokemons';
 	import { Search } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 
-	let pokemonList = [
-		{ id: 1, name: 'Bulbasaur' },
-		{ id: 4, name: 'Charmander' },
-		{ id: 7, name: 'Squirtle' }
-	];
+	const pagination = writable<Pagination>({ offset: 0, limit: 20 });
 
-	// You can add reactive variables and handlers here later for search input, filtering, pagination, etc.
+	function nextPage() {
+		pagination.update((p) => {
+			const next = p.offset + p.limit;
+			return { ...p, offset: next };
+		});
+		loadPage();
+	}
+
+	function prevPage() {
+		pagination.update((p) => {
+			const prev = Math.max(p.offset - p.limit, 0);
+			return { ...p, offset: prev };
+		});
+		loadPage();
+	}
+
+	const loadPage = async () => {
+		const $pagination = get(pagination);
+		await fetchAllPokemons($pagination);
+	};
+
+	import { get } from 'svelte/store';
+
+	onMount(() => {
+		loadPage();
+	});
 </script>
 
 <div class="bg-gradient-to-r from-red-600 to-red-700 px-4 py-16">
@@ -59,35 +85,30 @@
 		</div>
 	</div>
 
-	<PokedexGrid />
+	<PokedexGrid pokemons={$pokemons} />
 
 	<div class="mt-12 flex justify-center">
-		<nav class="flex items-center">
+		<nav class="flex items-center gap-2">
 			<button
-				class="flex h-10 w-10 items-center justify-center rounded-l-lg border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-				disabled
+				on:click={prevPage}
+				class="flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-300 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+				disabled={$pagination.offset === 0}
 			>
-				Prev
+				<span>←</span>
+				<span>Previous</span>
 			</button>
+
+			<span class="rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white shadow">
+				Page {$pagination.offset / $pagination.limit + 1}
+			</span>
+
 			<button
-				class="flex h-10 w-10 items-center justify-center border-b border-t border-gray-300 bg-red-600 font-medium text-white"
+				on:click={nextPage}
+				class="flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-300 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+				disabled={$pagination.offset + $pagination.limit >= $total}
 			>
-				1
-			</button>
-			<button
-				class="flex h-10 w-10 items-center justify-center border-b border-t border-gray-300 text-gray-600 hover:bg-gray-100"
-			>
-				2
-			</button>
-			<button
-				class="flex h-10 w-10 items-center justify-center border-b border-t border-gray-300 text-gray-600 hover:bg-gray-100"
-			>
-				3
-			</button>
-			<button
-				class="flex h-10 w-10 items-center justify-center rounded-r-lg border border-gray-300 text-gray-600 hover:bg-gray-100"
-			>
-				Next
+				<span>Next</span>
+				<span>→</span>
 			</button>
 		</nav>
 	</div>
