@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { pageNumbers, pagination } from '$lib/store/pokemons';
+	import { pageNumbers, pagination, total } from '$lib/store/pokemons';
 	import { derived } from 'svelte/store';
-
-	export let total: number;
 
 	const currentPage = derived(pagination, ($p) => Math.floor($p.offset / $p.limit) + 1);
 	const totalPages = derived(pagination, ($p) => Math.ceil(total / $p.limit));
