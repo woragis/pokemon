@@ -92,3 +92,29 @@ func RequireAllRoles(roles ...string) fiber.Handler {
 		return c.Next()
 	}
 }
+
+func RequireAnyRole(roles ...string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userID, ok := c.Locals("user_id").(uuid.UUID)
+		if !ok {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		var user models.User
+		if err := database.DB.Preload("Roles").First(&user, "id = ?", userID).Error; err != nil {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		for _, role := range roles {
+			for _, userRole := range user.Roles {
+				if userRole.Name == role {
+					return c.Next()
+				}
+			}
+		}
+
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Insufficient permissions",
+		})
+	}
+}
