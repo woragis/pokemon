@@ -4,7 +4,7 @@ import type { ForumTopic } from '$lib/types/forum';
 
 export interface PutForumTopicProps {
 	id: string;
-	topic: Omit<ForumTopic, 'id'>;
+	topic: Omit<ForumTopic, 'id' | 'author_id'>;
 }
 
 export async function putForumTopic({ id, topic }: PutForumTopicProps) {

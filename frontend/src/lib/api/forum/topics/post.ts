@@ -3,7 +3,7 @@ import { FORUM_TOPICS_URL } from '.';
 import type { ForumTopic } from '$lib/types/forum';
 
 export interface PostForumTopicProps {
-	topic: Omit<ForumTopic, 'id'>;
+	topic: Omit<ForumTopic, 'id' | 'author_id'>;
 }
 
 export async function postForumTopic({ topic }: PostForumTopicProps) {

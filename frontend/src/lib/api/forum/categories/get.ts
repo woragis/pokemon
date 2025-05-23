@@ -1,10 +1,11 @@
+import type { ForumCategory } from '$lib/types/forum';
 import { FORUM_CATEGORIES_URL } from '.';
 
 export interface FetchForumCategoryProps {
 	id: string;
 }
 
-export async function fetchForumCategories() {
+export async function fetchForumCategories(): Promise<ForumCategory[]> {
 	try {
 		const res = await fetch(`${FORUM_CATEGORIES_URL}/`);
 		if (!res.ok) throw new Error();
@@ -14,7 +15,9 @@ export async function fetchForumCategories() {
 	}
 }
 
-export async function fetchForumCategoryById({ id }: FetchForumCategoryProps) {
+export async function fetchForumCategoryById({
+	id
+}: FetchForumCategoryProps): Promise<ForumCategory> {
 	try {
 		const res = await fetch(`${FORUM_CATEGORIES_URL}/${id}`);
 		if (!res.ok) throw new Error();
