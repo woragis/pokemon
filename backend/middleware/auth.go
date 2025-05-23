@@ -63,3 +63,32 @@ func RequireRole(roles ...string) fiber.Handler {
 		})
 	}
 }
+
+func RequireAllRoles(roles ...string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userID, ok := c.Locals("user_id").(uuid.UUID)
+		if !ok {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		var user models.User
+		if err := database.DB.Preload("Roles").First(&user, "id = ?", userID).Error; err != nil {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		roleSet := make(map[string]bool)
+		for _, r := range user.Roles {
+			roleSet[r.Name] = true
+		}
+
+		for _, required := range roles {
+			if !roleSet[required] {
+				return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+					"error": "Missing required role: " + required,
+				})
+			}
+		}
+
+		return c.Next()
+	}
+}
