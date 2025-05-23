@@ -4,10 +4,10 @@ import { getHeaders } from '..';
 
 export interface PutShoutProps {
 	id: string;
-	shout: Omit<Shout, 'id' | 'created_at' | 'updated_at'>;
+	shout: { content: string };
 }
 
-export async function putShout({ id, shout }: PutShoutProps) {
+export async function putShout({ id, shout }: PutShoutProps): Promise<Shout> {
 	const headers = getHeaders();
 	try {
 		const res = await fetch(`${SHOUT_URL}/${id}`, {

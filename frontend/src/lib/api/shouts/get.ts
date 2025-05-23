@@ -1,10 +1,11 @@
+import type { Shout } from '$lib/types/shouts';
 import { SHOUT_URL } from '.';
 
 export interface FetchShoutProps {
 	id: string;
 }
 
-export async function fetchShouts() {
+export async function fetchShouts(): Promise<Shout[]> {
 	try {
 		const res = await fetch(`${SHOUT_URL}/`);
 		if (!res.ok) throw new Error();
@@ -14,7 +15,7 @@ export async function fetchShouts() {
 	}
 }
 
-export async function fetchShoutById({ id }: FetchShoutProps) {
+export async function fetchShoutById({ id }: FetchShoutProps): Promise<Shout> {
 	try {
 		const res = await fetch(`${SHOUT_URL}/${id}`);
 		if (!res.ok) throw new Error();
