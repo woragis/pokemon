@@ -43,6 +43,9 @@ func ConnectDB() *gorm.DB {
         &models.Permission{},
         &models.RolePermission{},
         &models.UserRole{},
+        &models.Snap{},
+        &models.Comment{},
+        &models.Like{},
     )
     if err != nil {
         log.Fatalf("Failed to run migrations: %v", err)
