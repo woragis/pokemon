@@ -165,6 +165,7 @@ func EditForumCategoryById(c *fiber.Ctx) error {
 	}
 	category.Name = input.Name
 	category.Color = input.Color
+	category.Description = input.Description
 	if err := database.DB.Save(&category).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}

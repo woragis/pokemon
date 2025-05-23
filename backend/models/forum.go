@@ -10,7 +10,8 @@ import (
 type ForumCategory struct {
 	ID    uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	Name  string    `gorm:"uniqueIndex;not null" json:"name"`
-	Color string    `gorm:"not null" json:"color"` // Tailwind class like 'bg-red-500'
+	Color string    `gorm:"not null" json:"color"`
+	Description string    `json:"description"`
 }
 
 // ForumTopic represents a discussion topic in the forum.
