@@ -223,18 +223,40 @@ func GetForumTopicComments(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid topic UUID"})
 	}
 
-	var comments []models.ForumTopicComment
+	// Parse pagination query params with defaults
+	limit := c.QueryInt("limit", 10)
+	offset := c.QueryInt("offset", 0)
 
-	// Fetch with author (user) details using Preload
+	var comments []models.ForumTopicComment
+	var total int64
+
+	// Count total comments
+	if err := database.DB.
+		Model(&models.ForumTopicComment{}).
+		Where("topic_id = ?", topicID).
+		Count(&total).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Fetch paginated comments with user info
 	if err := database.DB.
 		Preload("User").
 		Where("topic_id = ?", topicID).
 		Order("created_at ASC").
+		Limit(limit).
+		Offset(offset).
 		Find(&comments).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.JSON(comments)
+	return c.JSON(fiber.Map{
+		"comments": comments,
+		"pagination": fiber.Map{
+			"total":  total,
+			"limit":  limit,
+			"offset": offset,
+		},
+	})
 }
 
 func CommentOnForumTopic(c *fiber.Ctx) error {
