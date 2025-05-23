@@ -7,48 +7,34 @@ import (
 )
 
 type Shout struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	UserID       uuid.UUID      `gorm:"type:uuid;not null;index"`
-	User         User           `gorm:"foreignKey:UserID"`
+	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	UserID       uuid.UUID      `gorm:"type:uuid;not null;index" json:"user_id"`
+	User         User           `gorm:"foreignKey:UserID" json:"user"`
+	Content      string         `gorm:"type:varchar(280);not null" json:"content"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
 
-	Content      string         `gorm:"type:varchar(280);not null"`
+	ReshoutOfID  *uuid.UUID     `gorm:"type:uuid;index" json:"reshout_of_id,omitempty"`
+	ReshoutOf    *Shout         `gorm:"foreignKey:ReshoutOfID" json:"reshout_of,omitempty"`
+	QuoteContent *string        `gorm:"type:varchar(280)" json:"quote_content,omitempty"`
+	Likes        []ShoutLike    `gorm:"constraint:OnDelete:CASCADE" json:"likes"`
+	Comments     []ShoutComment `gorm:"constraint:OnDelete:CASCADE" json:"comments"`
 
-	CreatedAt    time.Time
-	UpdatedAt    time.Time      // Good practice for edit history
-
-	// Reshout / Quote-shout
-	ReshoutOfID  *uuid.UUID     `gorm:"type:uuid;index"`
-	ReshoutOf    *Shout         `gorm:"foreignKey:ReshoutOfID"`
-
-	QuoteContent *string        `gorm:"type:varchar(280)"`
-
-	// Relationships
-	Likes        []ShoutLike    `gorm:"constraint:OnDelete:CASCADE"`
-	Comments     []ShoutComment `gorm:"constraint:OnDelete:CASCADE"`
-
-	// AIReplyContent *string     // Future feature
-
-	// Admin managed
-	IsFlagged bool `gorm:"default:false"`
+	IsFlagged    bool           `gorm:"default:false" json:"is_flagged"`
 }
 
 type ShoutLike struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	UserID    uuid.UUID `gorm:"type:uuid;not null;index"`
-	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index"`
-
-	// Prevent duplicate likes per user per shout
-	// Add a unique index
-	// gorm:"uniqueIndex:idx_user_shout_like"
+	ID      uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	UserID  uuid.UUID `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_shout_like" json:"user_id"`
+	ShoutID uuid.UUID `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_shout_like" json:"shout_id"`
 }
 
 type ShoutComment struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	UserID    uuid.UUID `gorm:"type:uuid;not null;index"`
-	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index"`
-	Content   string    `gorm:"type:text;not null"`
-	CreatedAt time.Time
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	UserID    uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
+	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index" json:"shout_id"`
+	Content   string    `gorm:"type:text;not null" json:"content"`
+	CreatedAt time.Time `json:"created_at"`
 
-	// Admin managed
-	IsFlagged bool `gorm:"default:false"`
+	IsFlagged bool `gorm:"default:false" json:"is_flagged"`
 }
