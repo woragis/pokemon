@@ -49,6 +49,9 @@ func ConnectDB() *gorm.DB {
         &models.ForumCategory{},
         &models.ForumTopic{},
         &models.ForumTopicResponse{},
+        &models.ForumTopicLike{},
+        &models.ForumTopicComment{},
+        &models.ForumTopicView{},
     )
     if err != nil {
         log.Fatalf("Failed to run migrations: %v", err)
