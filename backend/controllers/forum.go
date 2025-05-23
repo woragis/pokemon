@@ -217,6 +217,26 @@ func LikeForumTopic(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusCreated)
 }
 
+func GetForumTopicComments(c *fiber.Ctx) error {
+	topicID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid topic UUID"})
+	}
+
+	var comments []models.ForumTopicComment
+
+	// Fetch with author (user) details using Preload
+	if err := database.DB.
+		Preload("User").
+		Where("topic_id = ?", topicID).
+		Order("created_at ASC").
+		Find(&comments).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(comments)
+}
+
 func CommentOnForumTopic(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(uuid.UUID)
 	if !ok {
