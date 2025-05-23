@@ -3,23 +3,40 @@
 	import { page } from '$app/stores';
 	import { MessageSquare, Heart, Eye } from 'lucide-svelte';
 	import type { ForumTopicResponse } from '$lib/types/forum';
-	import { fetchForumTopicById } from '$lib/api/forum';
+	import { fetchForumTopicById, likeForumTopicById, viewForumTopicById } from '$lib/api/forum';
 
 	let topic: ForumTopicResponse | null = null;
 	let loading = true;
 	let error: string | null = null;
+	let liked = false;
 
 	$: topicId = $page.params.id;
 
 	onMount(async () => {
 		try {
 			topic = await fetchForumTopicById({ id: topicId });
+
+			if (topic) {
+				await viewForumTopicById({ id: topicId });
+				topic.views += 1;
+			}
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Unknown error';
 		} finally {
 			loading = false;
 		}
 	});
+
+	async function toggleLike() {
+		if (!topic) return;
+		try {
+			const change = await likeForumTopicById({ id: topicId });
+			liked = change.liked;
+			topic.likes += liked ? 1 : -1;
+		} catch (err) {
+			console.error('Failed to like topic:', err);
+		}
+	}
 </script>
 
 {#if loading}
@@ -36,7 +53,6 @@
 		</div>
 
 		<div class="prose mb-6">
-			<!-- Placeholder for actual content -->
 			<p>{topic.content}</p>
 		</div>
 
@@ -45,8 +61,18 @@
 				<MessageSquare class="mr-1" size={16} />
 				{topic.replies} replies
 			</div>
-			<div class="flex items-center"><Heart class="mr-1" size={16} /> {topic.likes} likes</div>
-			<div class="flex items-center"><Eye class="mr-1" size={16} /> {topic.views} views</div>
+
+			<!-- Like Button -->
+			<button class="flex items-center hover:text-red-600" on:click={toggleLike}>
+				<Heart class="mr-1" size={16} fill={liked ? 'currentColor' : 'none'} />
+				{topic.likes}
+				{liked ? 'liked' : 'likes'}
+			</button>
+
+			<div class="flex items-center">
+				<Eye class="mr-1" size={16} />
+				{topic.views} views
+			</div>
 		</div>
 	</div>
 {/if}
