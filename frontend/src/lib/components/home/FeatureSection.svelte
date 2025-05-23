@@ -38,16 +38,16 @@
 	];
 </script>
 
-<section class="bg-white py-20">
-	<div class="container mx-auto px-4">
-		<div class="mb-16 text-center">
-			<h2 class="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">Feature-Packed Pokémon Hub</h2>
-			<p class="mx-auto max-w-2xl text-xl text-gray-600">
+<section class="feature-section">
+	<div class="feature-container">
+		<div class="feature-header">
+			<h2 class="feature-title">Feature-Packed Pokémon Hub</h2>
+			<p class="feature-subtitle">
 				Everything you need to enhance your Pokémon journey in one place.
 			</p>
 		</div>
 
-		<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+		<div class="feature-grid">
 			{#each features as feature, index}
 				<FeatureCard
 					title={feature.title}
@@ -60,3 +60,59 @@
 		</div>
 	</div>
 </section>
+
+<style>
+	.feature-section {
+		background-color: white;
+		padding: 80px 0;
+	}
+
+	.feature-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+
+	.feature-header {
+		margin-bottom: 64px;
+		text-align: center;
+	}
+
+	.feature-title {
+		font-size: 2rem;
+		font-weight: bold;
+		color: #1f2937; /* gray-900 */
+		margin-bottom: 1rem;
+	}
+
+	@media (min-width: 768px) {
+		.feature-title {
+			font-size: 2.5rem;
+		}
+	}
+
+	.feature-subtitle {
+		max-width: 640px;
+		margin: 0 auto;
+		font-size: 1.25rem;
+		color: #4b5563; /* gray-600 */
+	}
+
+	.feature-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+	}
+
+	@media (min-width: 768px) {
+		.feature-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.feature-grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+</style>
