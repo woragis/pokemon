@@ -37,6 +37,7 @@ func main() {
     routes.SetupRoleRoutes(api)
     routes.SetupUserRoutes(api)
     routes.RegisterSnapdexRoutes(api)
+    routes.RegisterForumRoutes(api)
 
     app.Listen(":3000")
 }
