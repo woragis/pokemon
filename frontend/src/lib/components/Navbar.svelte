@@ -12,7 +12,8 @@
 		PenTool,
 		HelpCircle,
 		LogOut,
-		PersonStanding
+		PersonStanding,
+		Smartphone
 	} from 'lucide-svelte';
 	import Link from './common/Link.svelte';
 	import { user } from '$lib/store/user';
@@ -60,6 +61,7 @@
 			<div class="hidden items-center space-x-8 md:flex">
 				<Link to="/" icon={Home} label="Home" />
 				<Link to="/pokedex" icon={BookOpen} label="Pokédex" />
+				<Link to="/snapdex" icon={Smartphone} label="SnapDex" />
 				<Link to="/shouts" icon={PersonStanding} label="Shouts" />
 				<Link to="/teams" icon={Users} label="Teams" />
 				<Link to="/news" icon={Newspaper} label="News" />
@@ -118,6 +120,7 @@
 			<div class="flex flex-col space-y-4">
 				<Link to="/" icon={Home} label="Home" mobile />
 				<Link to="/pokedex" icon={BookOpen} label="Pokédex" mobile />
+				<Link to="/snapdex" icon={Smartphone} label="SnapDex" mobile />
 				<Link to="/shouts" icon={PersonStanding} label="Shouts" mobile />
 				<Link to="/teams" icon={Users} label="Teams" mobile />
 				<Link to="/news" icon={Newspaper} label="News" mobile />
