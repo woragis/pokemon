@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func CreateForumTopic(c *fiber.Ctx) error {
@@ -17,7 +18,8 @@ func CreateForumTopic(c *fiber.Ctx) error {
 	}
 	var input struct {
 		Title      string    `json:"title"`
-		CategoryID uuid.UUID `json:"categoryId"`
+		Content    string    `json:"content"`
+		CategoryID uuid.UUID `json:"category_id"`
 		Pinned     bool      `json:"pinned"`
 	}
 	if err := c.BodyParser(&input); err != nil {
@@ -75,7 +77,8 @@ func EditForumTopicById(c *fiber.Ctx) error {
 	}
 	var input struct {
 		Title      *string    `json:"title"`
-		CategoryID *uuid.UUID `json:"categoryId"`
+		Content    *string `json:"content"`
+		CategoryID *uuid.UUID `json:"category_id"`
 		Pinned     *bool      `json:"pinned"`
 	}
 	if err := c.BodyParser(&input); err != nil {
@@ -83,6 +86,9 @@ func EditForumTopicById(c *fiber.Ctx) error {
 	}
 	if input.Title != nil {
 		topic.Title = *input.Title
+	}
+	if input.Content != nil {
+		topic.Content = *input.Content
 	}
 	if input.CategoryID != nil {
 		topic.CategoryID = *input.CategoryID
@@ -180,5 +186,115 @@ func DeleteForumCategoryById(c *fiber.Ctx) error {
 	if err := database.DB.Delete(&models.ForumCategory{}, "id = ?", uid).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
+// Topic interactions
+func LikeForumTopic(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(uuid.UUID)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	topicID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid topic UUID"})
+	}
+
+	like := models.ForumTopicLike{
+		UserID:  userID,
+		TopicID: topicID,
+	}
+
+	if err := database.DB.Create(&like).Error; err != nil {
+		// Prevent duplicate likes
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "already liked"})
+	}
+
+	// Optionally update like counter
+	database.DB.Model(&models.ForumTopic{}).Where("id = ?", topicID).UpdateColumn("likes_count", gorm.Expr("likes_count + 1"))
+
+	return c.SendStatus(fiber.StatusCreated)
+}
+
+func CommentOnForumTopic(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(uuid.UUID)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	topicID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid topic UUID"})
+	}
+
+	var input struct {
+		Content string `json:"content"`
+	}
+	if err := c.BodyParser(&input); err != nil || input.Content == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid body"})
+	}
+
+	comment := models.ForumTopicComment{
+		UserID:  userID,
+		TopicID: topicID,
+		Content: input.Content,
+	}
+
+	if err := database.DB.Create(&comment).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Optionally update reply count
+	database.DB.Model(&models.ForumTopic{}).Where("id = ?", topicID).UpdateColumn("replies_count", gorm.Expr("replies_count + 1"))
+
+	return c.JSON(comment)
+}
+
+func ViewForumTopic(c *fiber.Ctx) error {
+	var userID *uuid.UUID
+	if uid, ok := c.Locals("user_id").(uuid.UUID); ok {
+		userID = &uid
+	}
+
+	topicID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid topic UUID"})
+	}
+
+	ip := c.IP()
+
+	view := models.ForumTopicView{
+		TopicID:   topicID,
+		UserID:    userID,
+		IPAddress: ip,
+	}
+
+	// Prevent duplicate view from same user/IP (optional)
+	_ = database.DB.Create(&view)
+
+	// Update views count (can be approximate)
+	database.DB.Model(&models.ForumTopic{}).Where("id = ?", topicID).UpdateColumn("views_count", gorm.Expr("views_count + 1"))
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func UnlikeForumTopic(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(uuid.UUID)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	topicID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid topic UUID"})
+	}
+
+	if err := database.DB.Where("user_id = ? AND topic_id = ?", userID, topicID).Delete(&models.ForumTopicLike{}).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	database.DB.Model(&models.ForumTopic{}).Where("id = ?", topicID).UpdateColumn("likes_count", gorm.Expr("likes_count - 1"))
+
 	return c.SendStatus(fiber.StatusNoContent)
 }
