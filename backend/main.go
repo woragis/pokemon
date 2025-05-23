@@ -33,6 +33,9 @@ func main() {
     routes.RegisterPokedexRoutes(api)
     routes.BlogRoutes(api)
     routes.SetupGameRoutes(api)
+    routes.SetupPermissionRoutes(api)
+    routes.SetupRoleRoutes(api)
+    routes.SetupUserRoutes(api)
 
     app.Listen(":3000")
 }
