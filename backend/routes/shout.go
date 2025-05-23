@@ -18,6 +18,8 @@ func RegisterShoutRoutes(api fiber.Router) {
 
 	userShouts := shouts.Group("/", middleware.RequireAuth())
 	userShouts.Post("/", middleware.RequireAuth(), controllers.PostShout)
+	userShouts.Put("/:id", controllers.EditShoutByID)
+	userShouts.Delete("/:id", controllers.DeleteShoutByID)
 	userShouts.Post("/:id/like", controllers.LikeShout)
 	userShouts.Post("/:id/comment", controllers.CommentOnShout)
 	userShouts.Post("/:id/reshout", controllers.Reshout)
