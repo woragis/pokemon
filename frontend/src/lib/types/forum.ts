@@ -1,3 +1,5 @@
+import type { User } from './user';
+
 export interface ForumCategory {
 	id: string;
 	name: string;
@@ -16,12 +18,22 @@ export interface ForumTopic {
 export interface ForumTopicResponse {
 	id: string;
 	title: string;
-	author: string;
+	content: string;
+	author: User;
 	authorAvatar: string;
-	date: string;
 	replies: number;
 	likes: number;
 	views: number;
-	category: string;
+	category: ForumCategory;
 	pinned: boolean;
+	created_at: string;
+	updated_at: string;
 }
+
+export type ForumComment = {
+	id: string;
+	content: string;
+	user: User;
+	created_at: string;
+	updated_at: string;
+};
