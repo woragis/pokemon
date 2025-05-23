@@ -17,7 +17,7 @@
 	});
 
 	const submit = async () => {
-		await putShout({ id, shout: { content, author } });
+		await putShout({ id, shout: { content } });
 		goto(`/shouts/${id}`);
 	};
 </script>
@@ -25,7 +25,6 @@
 <div class="mx-auto max-w-md p-4">
 	<h1 class="mb-4 text-2xl font-bold">Edit Shout</h1>
 	<form on:submit|preventDefault={submit} class="space-y-4">
-		<input bind:value={author} class="w-full rounded border p-2" required />
 		<textarea bind:value={content} class="w-full rounded border p-2" rows="4" required></textarea>
 		<button type="submit" class="rounded bg-yellow-500 px-4 py-2 text-white">Update</button>
 	</form>
