@@ -16,26 +16,48 @@
 	};
 </script>
 
-<div class="mx-auto max-w-3xl p-4">
-	<h1 class="mb-4 text-2xl font-bold">Shouts</h1>
-	<a href="/shouts/new" class="mb-4 inline-block rounded bg-blue-500 px-4 py-2 text-white"
-		>New Shout</a
-	>
+<div class="mx-auto max-w-2xl px-4 pt-6">
+	<!-- Header -->
+	<div class="mb-6 border-b pb-4">
+		<h1 class="text-3xl font-semibold text-gray-900">Shouts</h1>
+	</div>
 
+	<!-- New Shout Button -->
+	<div class="mb-6">
+		<a
+			href="/shouts/new"
+			class="inline-flex items-center rounded-full bg-blue-500 px-6 py-2 font-medium text-white transition hover:bg-blue-600"
+		>
+			➕ New Shout
+		</a>
+	</div>
+
+	<!-- Shout Feed -->
 	{#if shouts.length === 0}
-		<p>No shouts yet.</p>
+		<p class="text-center text-gray-500">No shouts yet.</p>
 	{:else}
-		<ul class="space-y-4">
+		<ul class="space-y-6">
 			{#each shouts as shout}
-				<li class="rounded border p-4 shadow-sm">
-					<p class="text-lg">{shout.content}</p>
-					<p class="mt-1 text-sm text-gray-500">
-						By {shout.author} — {new Date(shout.created_at).toLocaleString()}
+				<li
+					class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+				>
+					<!-- Content -->
+					<p class="whitespace-pre-line text-base text-gray-800">{shout.content}</p>
+
+					<!-- Meta Info -->
+					<p class="mt-3 text-sm text-gray-500">
+						<span class="font-semibold text-gray-700">{shout.user.name}</span>
+						<span class="mx-1">·</span>
+						{new Date(shout.created_at).toLocaleString()}
 					</p>
-					<div class="mt-2 flex gap-2">
-						<a href={`/shouts/${shout.id}`} class="text-blue-600">View</a>
-						<a href={`/shouts/${shout.id}/edit`} class="text-yellow-600">Edit</a>
-						<button on:click={() => handleDelete(shout.id)} class="text-red-600">Delete</button>
+
+					<!-- Action Buttons -->
+					<div class="mt-4 flex gap-4 text-sm text-gray-600">
+						<a href={`/shouts/${shout.id}`} class="text-blue-600 hover:underline">View</a>
+						<a href={`/shouts/${shout.id}/edit`} class="text-yellow-600 hover:underline">Edit</a>
+						<button on:click={() => handleDelete(shout.id)} class="text-red-600 hover:underline">
+							Delete
+						</button>
 					</div>
 				</li>
 			{/each}
