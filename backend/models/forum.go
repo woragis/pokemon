@@ -6,6 +6,19 @@ import (
 	"github.com/google/uuid"
 )
 
+/*
+Future features
+🧠 Additional Tips
+
+    Add DB triggers or application logic to update RepliesCount, LikesCount, and ViewsCount for performance.
+
+    Add soft delete (gorm.DeletedAt) if you want users to remove comments or likes.
+
+    Add ParentID to ForumTopicComment for nested discussions.
+
+Let me know if you want threaded replies, reactions (like ❤️ or 😂), or a notification system.
+*/
+
 // ForumCategory represents predefined categories like Competitive, General, etc.
 type ForumCategory struct {
 	ID    uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
@@ -19,6 +32,7 @@ type ForumTopic struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 
 	Title string `gorm:"type:varchar(255);not null" json:"title"`
+	Content string `gorm:"type:varchar(255);not null" json:"content"`
 
 	AuthorID uuid.UUID `gorm:"type:uuid;not null;index" json:"-"`
 	Author   User      `gorm:"foreignKey:AuthorID" json:"author"`
@@ -32,19 +46,61 @@ type ForumTopic struct {
 	LikesCount   int64 `gorm:"default:0" json:"likes"`
 	ViewsCount   int64 `gorm:"default:0" json:"views"`
 
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type ForumTopicResponse struct {
 	ID           uuid.UUID `json:"id"`
 	Title        string    `json:"title"`
 	Author       string    `json:"author"`
-	AuthorAvatar string    `json:"authorAvatar"`
+	AuthorAvatar string    `json:"author_avatar"`
 	Date         string    `json:"date"`
 	Replies      int64     `json:"replies"`
 	Likes        int64     `json:"likes"`
 	Views        int64     `json:"views"`
 	Category     string    `json:"category"`
 	Pinned       bool      `json:"pinned"`
+}
+
+// Interactions
+type ForumTopicLike struct {
+	ID uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+
+	UserID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_user_topic_like" json:"-"`
+	User   User      `gorm:"foreignKey:UserID" json:"user"`
+
+	TopicID uuid.UUID  `gorm:"type:uuid;not null;uniqueIndex:idx_user_topic_like" json:"-"`
+	Topic   ForumTopic `gorm:"foreignKey:TopicID" json:"-"`
+
+	CreatedAt time.Time `json:"created_at"`
+}
+
+
+type ForumTopicComment struct {
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+
+	TopicID   uuid.UUID  `gorm:"type:uuid;not null;index" json:"-"`
+	Topic     ForumTopic `gorm:"foreignKey:TopicID" json:"-"`
+
+	UserID    uuid.UUID `gorm:"type:uuid;not null;index" json:"-"`
+	User      User      `gorm:"foreignKey:UserID" json:"user"`
+
+	Content   string `gorm:"type:text;not null" json:"content"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type ForumTopicView struct {
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+
+	UserID    *uuid.UUID `gorm:"type:uuid;index" json:"-"`
+	User      *User      `gorm:"foreignKey:UserID" json:"user,omitempty"` // Nullable for guests
+
+	TopicID   uuid.UUID  `gorm:"type:uuid;not null;index" json:"-"`
+	Topic     ForumTopic `gorm:"foreignKey:TopicID" json:"-"`
+
+	IPAddress string    `gorm:"type:inet" json:"ip,omitempty"` // Optional
+	CreatedAt time.Time `json:"created_at"`
 }
