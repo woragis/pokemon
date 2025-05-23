@@ -15,5 +15,9 @@ export {
 	fetchForumTopicById,
 	postForumTopic,
 	putForumTopic,
-	deleteForumTopic
+	deleteForumTopic,
+	likeForumTopicById,
+	viewForumTopicById,
+	fetchForumCommentsByTopicId,
+	createForumComment
 } from './topics';
