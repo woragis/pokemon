@@ -38,21 +38,28 @@ func RequireAuth() fiber.Handler {
 }
 
 func RequireRole(roles ...string) fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        userID := c.Locals("user_id").(uuid.UUID)
-        var user models.User
-        if err := database.DB.First(&user, "id = ?", userID).Error; err != nil {
-            return c.SendStatus(fiber.StatusUnauthorized)
-        }
+	return func(c *fiber.Ctx) error {
+		userID, ok := c.Locals("user_id").(uuid.UUID)
+		if !ok {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
 
-        for _, r := range roles {
-            if user.Role == r {
-                return c.Next()
-            }
-        }
+		var user models.User
+		if err := database.DB.Preload("Roles").First(&user, "id = ?", userID).Error; err != nil {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
 
-        return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-            "error": "Insufficient permissions",
-        })
-    }
+		// Check if user has at least one of the required roles
+		for _, userRole := range user.Roles {
+			for _, requiredRole := range roles {
+				if userRole.Name == requiredRole {
+					return c.Next()
+				}
+			}
+		}
+
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Insufficient permissions",
+		})
+	}
 }
