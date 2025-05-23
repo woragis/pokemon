@@ -4,3 +4,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input,
+textarea {
+	@apply focus:ring-2 focus:ring-yellow-500 focus:outline-none;
+}
+
+.title {
+	color: #d70009;
+	font-size: 2rem;
+}
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 1rem;
+}
+.card {
+	border: 2px solid #f00d22;
+	padding: 1rem;
+	border-radius: 8px;
+	color: #1450ee;
+	text-decoration: none;
+	background-color: #fff;
+	transition: box-shadow 0.2s ease;
+}
+.card:hover {
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
