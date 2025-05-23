@@ -59,6 +59,33 @@ func GetShoutFeed(c *fiber.Ctx) error {
 	return c.JSON(shouts)
 }
 
+func GetShoutByID(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+
+	// Validate UUID
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid shout ID",
+		})
+	}
+
+	var shout models.Shout
+
+	// Load shout with related User, Likes, Comments (optional: preload ReshoutOf)
+	if err := database.DB.Preload("User").
+		Preload("Likes").
+		Preload("Comments").
+		Preload("ReshoutOf").
+		First(&shout, "id = ?", id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Shout not found",
+		})
+	}
+
+	return c.JSON(shout)
+}
+
 // ✅ Working
 // ✅ Tested (not yet)
 func LikeShout(c *fiber.Ctx) error {
@@ -111,6 +138,7 @@ func CommentOnShout(c *fiber.Ctx) error {
 		UserID:  userID,
 		ShoutID: shoutID,
 		Content: body.Content,
+		CreatedAt: time.Now(),
 	}
 
 	if err := database.DB.Create(&comment).Error; err != nil {
