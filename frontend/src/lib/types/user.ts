@@ -2,6 +2,7 @@ import type { PokemonGame } from './games';
 
 export interface User {
 	id: string;
+	avatar: string;
 	username: string;
 	email: string;
 	name: string;
