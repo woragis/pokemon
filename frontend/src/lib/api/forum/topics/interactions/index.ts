@@ -1,4 +1,5 @@
 import { getCookie } from '$lib/api';
+import type { ForumComment } from '$lib/types/forum';
 import { FORUM_TOPICS_URL } from '..';
 
 export async function likeForumTopicById({ id }: { id: string }) {
@@ -20,8 +21,24 @@ export async function viewForumTopicById({ id }: { id: string }) {
 	if (!res.ok) throw new Error('Failed to register view');
 }
 
-export async function fetchForumCommentsByTopicId({ id }: { id: string }) {
-	const res = await fetch(`${FORUM_TOPICS_URL}/${id}/comments`);
+interface FetchForumCommentsByTopicIdResponse {
+	comments: ForumComment[];
+	pagination: {
+		total: number;
+		limit: number;
+		offset: number;
+	};
+}
+export async function fetchForumCommentsByTopicId({
+	id,
+	offset = 0,
+	limit = 10
+}: {
+	id: string;
+	offset?: number;
+	limit?: number;
+}): Promise<FetchForumCommentsByTopicIdResponse> {
+	const res = await fetch(`${FORUM_TOPICS_URL}/${id}/comments?offset=${offset}&limit=${limit}`);
 	if (!res.ok) throw new Error('Failed to fetch comments');
 	return res.json();
 }
@@ -34,5 +51,5 @@ export async function createForumComment({ id, content }: { id: string; content:
 		body: JSON.stringify({ content })
 	});
 	if (!res.ok) throw new Error('Failed to create comment');
-	return res.json();
+	return await res.json();
 }
