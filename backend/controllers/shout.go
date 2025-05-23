@@ -86,6 +86,87 @@ func GetShoutByID(c *fiber.Ctx) error {
 	return c.JSON(shout)
 }
 
+func EditShoutByID(c *fiber.Ctx) error {
+	shoutID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid shout ID",
+		})
+	}
+
+	userID := c.Locals("userID").(uuid.UUID)
+
+	var shout models.Shout
+	if err := database.DB.First(&shout, "id = ?", shoutID).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Shout not found",
+		})
+	}
+
+	// Check ownership
+	if shout.UserID != userID {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Not authorized to edit this shout",
+		})
+	}
+
+	// Parse request body
+	type Request struct {
+		Content *string `json:"content"`
+	}
+	var body Request
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	if body.Content != nil {
+		shout.Content = *body.Content
+	}
+
+	if err := database.DB.Save(&shout).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update shout",
+		})
+	}
+
+	return c.JSON(shout)
+}
+
+func DeleteShoutByID(c *fiber.Ctx) error {
+	shoutID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid shout ID",
+		})
+	}
+
+	userID := c.Locals("userID").(uuid.UUID)
+
+	var shout models.Shout
+	if err := database.DB.First(&shout, "id = ?", shoutID).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Shout not found",
+		})
+	}
+
+	// Check ownership
+	if shout.UserID != userID {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Not authorized to delete this shout",
+		})
+	}
+
+	if err := database.DB.Delete(&shout).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to delete shout",
+		})
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
 // ✅ Working
 // ✅ Tested (not yet)
 func LikeShout(c *fiber.Ctx) error {
