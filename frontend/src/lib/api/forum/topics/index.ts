@@ -1,6 +1,6 @@
-import { FORUM_URL } from '..';
+import { API_URL } from '$lib/api';
 
-export const FORUM_TOPICS_URL = `${FORUM_URL}/topics`;
+export const FORUM_TOPICS_URL = `${API_URL}/forum/topics`;
 
 export * from './get';
 export * from './post';
