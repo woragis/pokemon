@@ -19,6 +19,7 @@ func RegisterForumRoutes(api fiber.Router) {
 	forum.Post("/topics/:id/like", middleware.RequireAuth(), controllers.LikeForumTopic)
 	forum.Post("/topics/:id/like", middleware.RequireAuth(), controllers.UnlikeForumTopic)
 	forum.Post("/topics/:id/view", middleware.RequireAuth(), controllers.ViewForumTopic)
+	forum.Get("/topics/:id/comments", controllers.GetForumTopicComments)
 	forum.Post("/topics/:id/comments", middleware.RequireAuth(), controllers.CommentOnForumTopic)
 
 	// Categories
