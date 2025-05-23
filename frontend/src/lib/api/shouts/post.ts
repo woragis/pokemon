@@ -3,10 +3,10 @@ import { SHOUT_URL } from '.';
 import type { Shout } from '$lib/types/shouts';
 
 export interface PostShoutProps {
-	shout: Omit<Shout, 'id' | 'created_at' | 'updated_at'>;
+	shout: { content: string };
 }
 
-export async function postShout({ shout }: PostShoutProps) {
+export async function postShout({ shout }: PostShoutProps): Promise<Shout> {
 	const headers = getHeaders();
 	try {
 		const res = await fetch(`${SHOUT_URL}/`, {

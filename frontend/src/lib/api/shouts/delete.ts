@@ -5,7 +5,7 @@ export interface DeleteShoutProps {
 	id: string;
 }
 
-export async function deleteShout({ id }: DeleteShoutProps) {
+export async function deleteShout({ id }: DeleteShoutProps): Promise<void> {
 	const headers = getHeaders();
 	try {
 		const res = await fetch(`${SHOUT_URL}/${id}`, {
