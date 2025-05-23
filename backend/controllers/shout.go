@@ -94,7 +94,7 @@ func EditShoutByID(c *fiber.Ctx) error {
 		})
 	}
 
-	userID := c.Locals("userID").(uuid.UUID)
+	userID := c.Locals("user_id").(uuid.UUID)
 
 	var shout models.Shout
 	if err := database.DB.First(&shout, "id = ?", shoutID).Error; err != nil {
@@ -142,7 +142,7 @@ func DeleteShoutByID(c *fiber.Ctx) error {
 		})
 	}
 
-	userID := c.Locals("userID").(uuid.UUID)
+	userID := c.Locals("user_id").(uuid.UUID)
 
 	var shout models.Shout
 	if err := database.DB.First(&shout, "id = ?", shoutID).Error; err != nil {
