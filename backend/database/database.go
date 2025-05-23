@@ -39,6 +39,10 @@ func ConnectDB() *gorm.DB {
         &models.TrainerPokedexEntry{},
         &models.User{},
         &models.UserFollow{},
+        &models.Role{},
+        &models.Permission{},
+        &models.RolePermission{},
+        &models.UserRole{},
     )
     if err != nil {
         log.Fatalf("Failed to run migrations: %v", err)
