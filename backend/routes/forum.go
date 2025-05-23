@@ -15,6 +15,11 @@ func RegisterForumRoutes(api fiber.Router) {
 	forum.Get("/topics/:id", controllers.GetForumTopicById)
 	forum.Put("/topics/:id", middleware.RequireAuth(), controllers.EditForumTopicById)
 	forum.Delete("/topics/:id", middleware.RequireAuth(), controllers.DeleteForumTopicById)
+	// Topic interaction
+	forum.Post("/topics/:id/like", middleware.RequireAuth(), controllers.LikeForumTopic)
+	forum.Post("/topics/:id/like", middleware.RequireAuth(), controllers.UnlikeForumTopic)
+	forum.Post("/topics/:id/view", middleware.RequireAuth(), controllers.ViewForumTopic)
+	forum.Post("/topics/:id/comments", middleware.RequireAuth(), controllers.CommentOnForumTopic)
 
 	// Categories
 	forum.Post("/categories", middleware.RequireAuth(), controllers.CreateForumCategory)
