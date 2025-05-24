@@ -43,15 +43,22 @@ func ConnectDB() *gorm.DB {
         &models.Permission{},
         &models.RolePermission{},
         &models.UserRole{},
-        &models.Snap{},
-        &models.Comment{},
-        &models.Like{},
-        &models.ForumCategory{},
-        &models.ForumTopic{},
-        &models.ForumTopicResponse{},
-        &models.ForumTopicLike{},
-        &models.ForumTopicComment{},
-        &models.ForumTopicView{},
+
+        // Snaps
+        &models.Snap{}, // Post
+        &models.SnapComment{}, // Comments
+        &models.SnapLike{}, // Likes
+        &models.SnapReport{}, // Post Report
+        &models.SnapCommentReport{}, // Comment Report
+
+        // Forum
+        // Still Missing: Topic Comment Like, Topic Comment Comment, Topic Report Support, Topic Comment Report Support
+        &models.ForumCategory{}, // Category
+        &models.ForumTopic{}, // Topic
+        &models.ForumTopicLike{}, // Topic Like
+        &models.ForumTopicComment{}, // Topic Comment
+        &models.ForumTopicView{}, // Topic View
+        &models.ForumTopicResponse{}, // API Response
     )
     if err != nil {
         log.Fatalf("Failed to run migrations: %v", err)
