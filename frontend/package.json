@@ -48,6 +48,7 @@
 	},
 	"dependencies": {
 		"@inlang/paraglide-js": "^2.0.0",
+		"@tanstack/svelte-query": "^5.76.2",
 		"@types/node": "^22.15.19",
 		"lucide-svelte": "^0.511.0",
 		"marked": "^15.0.12"
