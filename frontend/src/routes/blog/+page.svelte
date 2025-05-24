@@ -1,86 +1,146 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import type { BlogPost } from '$lib/types/blog';
-	import { fetchBlogPosts } from '../../lib/api/blog';
+	import { useBlogPostsQuery } from '$lib/api/blog';
 	import { Clock, PenSquare, User } from 'lucide-svelte';
 
-	let posts: BlogPost[] = [];
-	let error: string | null = null;
-	let loading = false;
-
-	async function handleFetch() {
-		loading = true;
-		try {
-			posts = await fetchBlogPosts();
-		} catch (e: any) {
-			error = e.message;
-		} finally {
-			loading = false;
-		}
-	}
-
-	onMount(() => {
-		handleFetch();
-	});
+	const blogQuery = useBlogPostsQuery();
 </script>
 
-<h1>Pokémon Blog</h1>
-
-{#if loading}
-	<p>Loading blog posts...</p>
-{:else if error}
-	<p>Error: {error}</p>
+{#if $blogQuery.isLoading}
+	<p class="center-text">Loading blog posts...</p>
+{:else if $blogQuery.isError && $blogQuery.error}
+	<p class="center-text error">Error: {$blogQuery.error.message}</p>
 {:else}
-	<ul>
-		{#each posts as post}
-			<li>
-				<a href={`/blog/${post.id}`}>
-					<h2>{post.title}</h2>
-					<small>{post.date}</small>
-					<p>{post.excerpt}</p>
-				</a>
-			</li>
-		{/each}
-	</ul>
-{/if}
-
-<div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-16">
-	<div class="container mx-auto">
-		<h1 class="mb-4 text-center text-3xl font-bold text-white md:text-4xl">Pokémon Blog</h1>
-		<p class="mx-auto mb-8 max-w-2xl text-center text-blue-100">
+	<section class="blog-hero">
+		<h1>Pokémon Blog</h1>
+		<p class="blog-subtitle">
 			Discover in-depth articles, strategies, and stories from our community of trainers.
 		</p>
-		<div class="flex justify-center">
-			<a
-				href="/blog/new"
-				class="flex items-center rounded-lg bg-white px-6 py-3 font-semibold text-blue-600 transition-colors hover:bg-blue-50"
-			>
-				<PenSquare class="mr-1 h-4 w-4" />
-				Write New Post
-			</a>
-		</div>
-	</div>
-</div>
+		<a href="/blog/new" class="blog-btn">
+			<PenSquare class="blog-icon" />
+			Write New Post
+		</a>
+	</section>
 
-<div class="container mx-auto px-4 py-12">
-	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-		{#each posts as post}
-			<div class="overflow-hidden rounded-lg bg-white shadow-md">
-				<div class="p-6">
-					<h2 class="mb-2 text-xl font-bold text-gray-900">{post.title}</h2>
-					<p class="mb-4 text-gray-600">{post.content.slice(0, 150)}...</p>
-					<div class="mb-4 flex items-center text-sm text-gray-500">
-						<User class="mr-1 h-4 w-4" />
-						<!-- <span class="mr-4">{post.author.username}</span> -->
-						<Clock class="mr-1 h-4 w-4" />
-						<!-- <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span> -->
+	<section class="blog-posts">
+		{#each $blogQuery.data as post}
+			<div class="blog-post-card">
+				<div class="blog-post-content">
+					<h2>{post.title}</h2>
+					<p>{post.content.slice(0, 150)}...</p>
+					<div class="blog-post-meta">
+						<User class="blog-icon" />
+						<Clock class="blog-icon" />
 					</div>
-					<a
-						href={`/blog/${post.id}`}
-						class="font-medium text-blue-600 transition-colors hover:text-blue-800">Read More →</a
-					>
+					<a href={`/blog/${post.id}`} class="blog-read-more">Read More →</a>
 				</div>
 			</div>
 		{/each}
-	</div>
-</div>
+	</section>
+{/if}
+
+<style>
+	.center-text {
+		text-align: center;
+		margin-top: 2rem;
+	}
+
+	.error {
+		color: red;
+	}
+
+	.blog-hero {
+		background: linear-gradient(to right, #2563eb, #1d4ed8);
+		color: white;
+		padding: 4rem 1rem;
+		text-align: center;
+	}
+
+	.blog-hero h1 {
+		font-size: 2.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.blog-subtitle {
+		max-width: 600px;
+		margin: 0 auto 2rem;
+		font-size: 1.1rem;
+		color: #cbd5e1;
+	}
+
+	.blog-btn {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.75rem 1.5rem;
+		background-color: white;
+		color: #2563eb;
+		font-weight: bold;
+		text-decoration: none;
+		border-radius: 0.5rem;
+		transition: background 0.2s ease-in-out;
+	}
+
+	.blog-btn:hover {
+		background-color: #f1f5f9;
+	}
+
+	.blog-btn .blog-icon {
+		margin-right: 0.5rem;
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.blog-posts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 2rem;
+		padding: 3rem 1rem;
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.blog-post-card {
+		background-color: white;
+		border-radius: 0.75rem;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		overflow: hidden;
+	}
+
+	.blog-post-content {
+		padding: 1.5rem;
+	}
+
+	.blog-post-content h2 {
+		font-size: 1.25rem;
+		margin-bottom: 0.75rem;
+		color: #111827;
+	}
+
+	.blog-post-content p {
+		color: #4b5563;
+		margin-bottom: 1rem;
+	}
+
+	.blog-post-meta {
+		display: flex;
+		align-items: center;
+		color: #6b7280;
+		font-size: 0.875rem;
+		margin-bottom: 1rem;
+	}
+
+	.blog-post-meta .blog-icon {
+		width: 1rem;
+		height: 1rem;
+		margin-right: 0.5rem;
+	}
+
+	.blog-read-more {
+		color: #2563eb;
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.blog-read-more:hover {
+		text-decoration: underline;
+	}
+</style>
