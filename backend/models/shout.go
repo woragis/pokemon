@@ -35,6 +35,7 @@ type ShoutComment struct {
 	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index" json:"shout_id"`
 	Content   string    `gorm:"type:text;not null" json:"content"`
 	CreatedAt time.Time `json:"created_at"`
+	// Add comment field
 
 	IsFlagged bool `gorm:"default:false" json:"is_flagged"`
 }
