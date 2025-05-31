@@ -17,108 +17,111 @@
 </script>
 
 <section class="snapdex-feed">
-	<h1 class="title">Snapdex Feed</h1>
+	<h1 class="feed-title">Snapdex</h1>
 
 	{#if error}
-		<p class="error">{error}</p>
+		<p class="feed-error">{error}</p>
 	{:else if snaps.length === 0}
-		<p class="empty">No snaps yet. Be the first!</p>
+		<p class="feed-empty">No snaps yet. Be the first!</p>
 	{:else}
 		<ul class="feed-grid">
 			{#each snaps as snap}
-				<li>
+				<li class="feed-card">
 					<FeedPicture {snap} />
 				</li>
 			{/each}
 		</ul>
 	{/if}
 
-	<div class="feed-links">
-		<a href="/snapdex/create" class="feed-link">New</a>
-		<a href="/snapdex/me" class="feed-link">Me</a>
+	<div class="feed-actions">
+		<a href="/snapdex/create" class="feed-btn">New Snap</a>
+		<a href="/snapdex/me" class="feed-btn secondary">My Snaps</a>
 	</div>
 </section>
 
 <style>
 	.snapdex-feed {
 		padding: 2rem 1rem;
-		max-width: 1200px;
+		max-width: 1000px;
 		margin: 0 auto;
 	}
 
-	.snapdex-feed .title {
-		font-size: 2rem;
-		font-weight: bold;
+	.feed-title {
+		font-size: 2.25rem;
+		font-weight: 700;
 		text-align: center;
-		color: #1e40af; /* Blue-800 */
-		margin-bottom: 1.5rem;
+		color: #111827; /* Gray-900 */
+		margin-bottom: 2rem;
+		font-family: 'Segoe UI', sans-serif;
 	}
 
-	.snapdex-feed .error {
+	.feed-error {
 		color: #dc2626; /* Red-600 */
 		text-align: center;
+		font-size: 1rem;
 	}
 
-	.snapdex-feed .empty {
+	.feed-empty {
+		color: #6b7280; /* Gray-500 */
 		text-align: center;
-		color: #64748b; /* Gray-500 */
+		font-size: 1rem;
 	}
 
 	.feed-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 		gap: 1rem;
 	}
 
-	.feed-picture {
-		display: block;
-		border-radius: 0.5rem;
+	/* Simulating Instagram-like card container */
+	.feed-card {
+		border-radius: 0.75rem;
 		overflow: hidden;
-		background-color: #ffffff;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		background: white;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 		transition: transform 0.2s ease;
-		text-decoration: none;
-		color: #111827; /* Gray-900 */
+		cursor: pointer;
 	}
 
-	.feed-picture:hover {
-		transform: scale(1.02);
+	.feed-card:hover {
+		transform: scale(1.01);
 	}
 
-	.feed-picture img {
-		width: 100%;
-		height: 200px;
-		object-fit: cover;
-		display: block;
-	}
+	/* Assume FeedPicture handles internal styling (e.g., image, captions) */
 
-	.feed-picture p {
-		padding: 0.5rem 0.75rem;
-		font-size: 0.95rem;
-		color: #1e293b; /* Gray-800 */
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.feed-links {
+	.feed-actions {
 		margin-top: 2rem;
 		display: flex;
 		justify-content: center;
 		gap: 1rem;
+		flex-wrap: wrap;
 	}
 
-	.feed-link {
-		background-color: #2563eb; /* Blue-600 */
+	.feed-btn {
+		background-color: #000;
 		color: white;
-		padding: 0.5rem 1.25rem;
+		padding: 0.6rem 1.5rem;
 		border-radius: 0.5rem;
 		text-decoration: none;
 		font-weight: 600;
-		transition: background-color 0.2s ease;
+		font-size: 0.95rem;
+		transition:
+			background-color 0.2s ease,
+			transform 0.1s ease;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
-	.feed-link:hover {
-		background-color: #1d4ed8; /* Blue-700 */
+	.feed-btn:hover {
+		background-color: #111;
+		transform: translateY(-1px);
+	}
+
+	.feed-btn.secondary {
+		background-color: #f3f4f6; /* Gray-100 */
+		color: #111827;
+	}
+
+	.feed-btn.secondary:hover {
+		background-color: #e5e7eb; /* Gray-200 */
 	}
 </style>
