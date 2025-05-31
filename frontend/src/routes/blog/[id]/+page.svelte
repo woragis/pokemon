@@ -1,109 +1,215 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { ArrowLeft, Save } from 'lucide-svelte';
-	import { fetchBlogPostById } from '$lib/api/blog';
+	import { useBlogPostQuery } from '$lib/api/blog';
+	import type { BlogPost } from '$lib/types/blog';
+	import { onMount } from 'svelte';
 
 	export let id: string | undefined = undefined;
+	const isEditing = !id;
 
-	let error = '';
-	let post = {
+	const postQuery = id ? useBlogPostQuery(id) : undefined;
+
+	let localPost: BlogPost = {
+		id: '',
 		title: '',
 		content: '',
-		published: false
+		date: '',
+		excerpt: ''
 	};
 
 	let loading = false;
-	const isEditing = !id;
 
-	async function handleFetch() {
-		try {
-			if (id) {
-				post = await fetchBlogPostById({ id });
-			}
-		} catch (err) {
-			error = '';
+	onMount(() => {
+		if ($postQuery && $postQuery.data) {
+			// Clone the data into the local editable object
+			localPost = { ...$postQuery.data };
 		}
-	}
+	});
 
 	const handleEdit = async () => {
 		loading = true;
 		try {
-			// await putBlogPost({id, blog: post})
+			// Send `localPost` to backend
+			console.log(localPost);
+			// await putBlogPost({ id, blog: localPost });
 		} catch (error) {
 			console.error('Error editing post:', error);
 		} finally {
 			loading = false;
 		}
 	};
-
-	onMount(handleFetch);
 </script>
 
-<div class="min-h-screen bg-gray-50 pt-16">
-	<div class="container mx-auto px-4 py-8">
-		<div class="mx-auto max-w-4xl">
-			<div class="mb-6">
-				<a href="/blog" class="inline-flex items-center text-gray-600 hover:text-gray-900">
-					<ArrowLeft class="mr-2 h-4 w-4" />
+{#if $postQuery && $postQuery.isLoading}
+	<p class="center-text">Loading blog post...</p>
+{:else if $postQuery && $postQuery.isError && $postQuery.error}
+	<p class="center-text error">Error: {$postQuery.error.message}</p>
+{:else}
+	<div class="page">
+		<div class="container">
+			<div class="back-link">
+				<a href="/blog">
+					<ArrowLeft class="icon" />
 					Back to Blog
 				</a>
 			</div>
 
 			{#if isEditing}
-				<div class="rounded-lg bg-white p-6 shadow-md">
-					<h1 class="mb-6 text-2xl font-bold text-gray-900">Create New Post</h1>
+				<div class="form-card">
+					<h1 class="form-title">Create New Post</h1>
 					<form on:submit|preventDefault={handleEdit}>
-						<div class="mb-4">
-							<label class="mb-1 block text-sm font-medium text-gray-700">Title</label>
-							<input
-								type="text"
-								bind:value={post.title}
-								class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-								required
-							/>
+						<div class="form-group">
+							<label>Title</label>
+							<input type="text" bind:value={localPost.title} required />
 						</div>
 
-						<div class="mb-4">
-							<label class="mb-1 block text-sm font-medium text-gray-700"
-								>Content (Markdown supported)</label
-							>
-							<textarea
-								bind:value={post.content}
-								rows="15"
-								class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-								required
-							/>
+						<div class="form-group">
+							<label>Content (Markdown supported)</label>
+							<textarea rows="15" bind:value={localPost.content} required />
 						</div>
 
-						<div class="mb-6">
-							<label class="flex items-center">
-								<input
-									type="checkbox"
-									bind:checked={post.published}
-									class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-								/>
-								<span class="ml-2 text-sm text-gray-600">Publish immediately</span>
-							</label>
+						<div class="form-checkbox">
+							<!-- <label>
+								<input type="checkbox" bind:checked={localPost.excerpt} />
+								<span>Publish immediately</span>
+							</label> -->
 						</div>
 
-						<div class="flex justify-end">
-							<button
-								type="submit"
-								class="flex items-center rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
-								disabled={loading}
-							>
-								<Save class="mr-2 h-4 w-4" />
+						<div class="form-actions">
+							<button type="submit" disabled={loading}>
+								<Save class="icon" />
 								{loading ? 'Saving...' : 'Save Post'}
 							</button>
 						</div>
 					</form>
 				</div>
-			{:else}
-				<div class="rounded-lg bg-white p-6 shadow-md">
-					<h1 class="mb-4 text-3xl font-bold text-gray-900">{post.title}</h1>
-					<!-- <div class="prose max-w-none" innerHTML={marked(post.content)} /> -->
+			{:else if $postQuery && $postQuery.data}
+				<div class="form-card">
+					<h1 class="form-title">{$postQuery.data.title}</h1>
+					<!-- <div class="prose" innerHTML={marked($postQuery.data.content)} /> -->
 				</div>
 			{/if}
 		</div>
 	</div>
-</div>
+{/if}
+
+<style>
+	.page {
+		min-height: 100vh;
+		background-color: #f9fafb;
+		padding-top: 4rem;
+	}
+
+	.container {
+		max-width: 960px;
+		margin: 0 auto;
+		padding: 2rem;
+	}
+
+	.back-link {
+		margin-bottom: 1.5rem;
+	}
+
+	.back-link a {
+		display: inline-flex;
+		align-items: center;
+		color: #4b5563;
+		text-decoration: none;
+		font-weight: 500;
+		transition: color 0.2s;
+	}
+
+	.back-link a:hover {
+		color: #1f2937;
+	}
+
+	.icon {
+		margin-right: 0.5rem;
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.form-card {
+		background-color: white;
+		border-radius: 0.5rem;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		padding: 2rem;
+	}
+
+	.form-title {
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: #111827;
+		margin-bottom: 1.5rem;
+	}
+
+	.form-group {
+		margin-bottom: 1.5rem;
+	}
+
+	.form-group label {
+		display: block;
+		font-size: 0.875rem;
+		font-weight: 500;
+		margin-bottom: 0.5rem;
+		color: #374151;
+	}
+
+	.form-group input,
+	.form-group textarea {
+		width: 100%;
+		padding: 0.75rem;
+		border: 1px solid #d1d5db;
+		border-radius: 0.375rem;
+		font-size: 1rem;
+	}
+
+	.form-group input:focus,
+	.form-group textarea:focus {
+		border-color: #3b82f6;
+		outline: none;
+		box-shadow: 0 0 0 1px #3b82f6;
+	}
+
+	.form-checkbox {
+		margin-bottom: 2rem;
+	}
+
+	.form-checkbox label {
+		display: flex;
+		align-items: center;
+		font-size: 0.875rem;
+		color: #4b5563;
+	}
+
+	.form-checkbox input[type='checkbox'] {
+		margin-right: 0.5rem;
+	}
+
+	.form-actions {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.form-actions button {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.5rem 1.5rem;
+		background-color: #2563eb;
+		color: white;
+		border: none;
+		border-radius: 0.375rem;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.form-actions button:hover {
+		background-color: #1d4ed8;
+	}
+
+	.form-actions button:disabled {
+		background-color: #93c5fd;
+		cursor: not-allowed;
+	}
+</style>
