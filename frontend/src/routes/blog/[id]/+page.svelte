@@ -59,20 +59,20 @@
 					<h1 class="form-title">Create New Post</h1>
 					<form on:submit|preventDefault={handleEdit}>
 						<div class="form-group">
-							<label>Title</label>
-							<input type="text" bind:value={localPost.title} required />
+							<label for="title">Title</label>
+							<input id="title" type="text" bind:value={localPost.title} required />
 						</div>
 
 						<div class="form-group">
-							<label>Content (Markdown supported)</label>
-							<textarea rows="15" bind:value={localPost.content} required />
+							<label for="content">Content (Markdown supported)</label>
+							<textarea id="content" rows="15" bind:value={localPost.content} required></textarea>
 						</div>
 
 						<div class="form-checkbox">
-							<!-- <label>
-								<input type="checkbox" bind:checked={localPost.excerpt} />
+							<label>
+								<input type="checkbox" />
 								<span>Publish immediately</span>
-							</label> -->
+							</label>
 						</div>
 
 						<div class="form-actions">
