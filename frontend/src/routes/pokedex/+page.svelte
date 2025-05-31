@@ -1,75 +1,167 @@
 <script lang="ts">
-	import { fetchAllPokemons } from '$lib/api/pokedex';
 	import PokedexNav from '$lib/components/pokedex/PokedexNav.svelte';
 	import PokedexGrid from '$lib/components/pokedex/PokedexGrid.svelte';
-	import { pagination, pokemons, total } from '$lib/store/pokemons';
 	import { Search } from 'lucide-svelte';
-	import { onMount } from 'svelte';
-
-	let loading = false;
-
-	$: {
-		const { offset, limit } = $pagination;
-		loading = true;
-		fetchAllPokemons({ offset, limit }).then(() => {
-			loading = false;
-		});
-	}
-
-	onMount(() => {
-		fetchAllPokemons($pagination);
-	});
 </script>
 
-<div class="bg-gradient-to-r from-red-600 to-red-700 px-4 py-16">
-	<div class="container mx-auto">
-		<h1 class="mb-4 text-center text-3xl font-bold text-white md:text-4xl">Pokédex</h1>
-		<p class="mx-auto mb-8 max-w-2xl text-center text-red-100">
+<div class="hero-section">
+	<div class="container">
+		<h1 class="hero-title">Pokédex</h1>
+		<p class="hero-subtitle">
 			Explore the complete Pokémon database. Track your collection, learn about different species,
 			and discover their abilities.
 		</p>
 
-		<div class="relative mx-auto max-w-xl">
-			<div class="relative">
-				<input
-					type="text"
-					placeholder="Search Pokémon by name or number..."
-					class="w-full rounded-full border-2 border-white/30 bg-white/20 px-5 py-3 pr-12 text-white placeholder-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-				/>
-				<div class="absolute right-3 top-1/2 -translate-y-1/2 transform">
-					<Search class="h-5 w-5 text-white" />
+		<div class="search-wrapper">
+			<div class="search-box">
+				<input type="text" placeholder="Search Pokémon by name or number..." class="search-input" />
+				<div class="search-icon">
+					<Search class="search-icon-inner" />
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="container mx-auto px-4 py-12">
-	<div class="mb-8 rounded-lg bg-gray-100 p-4">
-		<div class="flex flex-wrap gap-2">
-			<button class="rounded-full bg-red-600 px-4 py-2 text-sm text-white">All Types</button>
-			<button class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-				>Fire</button
-			>
-			<button class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-				>Water</button
-			>
-			<button class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-				>Grass</button
-			>
-			<button class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-				>Electric</button
-			>
-			<button class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-				>Psychic</button
-			>
-			<button class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700"
-				>Dragon</button
-			>
+<div class="main-content">
+	<div class="filter-bar">
+		<div class="filter-buttons">
+			<button class="filter-button active">All Types</button>
+			<button class="filter-button">Fire</button>
+			<button class="filter-button">Water</button>
+			<button class="filter-button">Grass</button>
+			<button class="filter-button">Electric</button>
+			<button class="filter-button">Psychic</button>
+			<button class="filter-button">Dragon</button>
 		</div>
 	</div>
 
-	<PokedexGrid pokemons={$pokemons} />
-
+	<PokedexGrid />
 	<PokedexNav />
 </div>
+
+<style>
+	/* HERO SECTION */
+
+	.hero-section {
+		background: linear-gradient(to right, #dc2626, #b91c1c); /* from-red-600 to-red-700 */
+		padding: 4rem 1rem;
+		color: white;
+	}
+
+	.container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+
+	.hero-title {
+		text-align: center;
+		font-size: 2rem;
+		font-weight: bold;
+		margin-bottom: 1rem;
+	}
+
+	@media (min-width: 768px) {
+		.hero-title {
+			font-size: 2.5rem;
+		}
+	}
+
+	.hero-subtitle {
+		text-align: center;
+		color: #fecaca; /* red-100 */
+		max-width: 40rem;
+		margin: 0 auto 2rem;
+		font-size: 1rem;
+	}
+
+	/* SEARCH */
+
+	.search-wrapper {
+		max-width: 36rem;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.search-box {
+		position: relative;
+	}
+
+	.search-input {
+		width: 100%;
+		padding: 0.75rem 3rem 0.75rem 1.25rem;
+		border-radius: 9999px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		background-color: rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(6px);
+		color: white;
+		font-size: 1rem;
+		placeholder-color: rgba(255, 255, 255, 0.7);
+	}
+
+	.search-input::placeholder {
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.search-input:focus {
+		outline: none;
+		box-shadow: 0 0 0 3px #facc15; /* ring-yellow-400 */
+	}
+
+	.search-icon {
+		position: absolute;
+		top: 50%;
+		right: 0.75rem;
+		transform: translateY(-50%);
+		pointer-events: none;
+	}
+
+	.search-icon-inner {
+		width: 1.25rem;
+		height: 1.25rem;
+		color: white;
+	}
+
+	/* MAIN CONTENT */
+
+	.main-content {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 3rem 1rem;
+	}
+
+	.filter-bar {
+		background-color: #f3f4f6; /* gray-100 */
+		border-radius: 0.5rem;
+		padding: 1rem;
+		margin-bottom: 2rem;
+	}
+
+	.filter-buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.filter-button {
+		border: 1px solid #d1d5db; /* gray-300 */
+		background-color: white;
+		color: #374151; /* gray-700 */
+		font-size: 0.875rem;
+		padding: 0.5rem 1rem;
+		border-radius: 9999px;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
+	}
+
+	.filter-button:hover {
+		background-color: #f3f4f6;
+	}
+
+	.filter-button.active {
+		background-color: #dc2626; /* red-600 */
+		color: white;
+		border: none;
+	}
+</style>
