@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fetchAllPokemons } from '$lib/api/pokedex';
 	import PokedexNav from '$lib/components/pokedex/PokedexNav.svelte';
-	import PokedexGrid from '$lib/components/pokemon/PokedexGrid.svelte';
+	import PokedexGrid from '$lib/components/pokedex/PokedexGrid.svelte';
 	import { pagination, pokemons, total } from '$lib/store/pokemons';
 	import { Search } from 'lucide-svelte';
 	import { onMount } from 'svelte';
