@@ -1,15 +1,21 @@
 <script>
 	import { ChevronRight, Search } from 'lucide-svelte';
 	import pokeball from '$lib/assets/pokeball-logo.png';
+	import { onMount } from 'svelte';
+
+	let visible = false;
+	onMount(() => {
+		visible = true;
+	});
 </script>
 
 <div class="hero">
 	<!-- Decorative Pokeball pattern in the background -->
 	<div class="pokeballs">
-		<img class="ball ball-1" src={pokeball} alt="pokeball" />
-		<img class="ball ball-2" src={pokeball} alt="pokeball" />
-		<img class="ball ball-3" src={pokeball} alt="pokeball" />
-		<img class="ball ball-4" src={pokeball} alt="pokeball" />
+		<img class:visible class="ball ball-1" src={pokeball} alt="pokeball" />
+		<img class:visible class="ball ball-2" src={pokeball} alt="pokeball" />
+		<img class:visible class="ball ball-3" src={pokeball} alt="pokeball" />
+		<img class:visible class="ball ball-4" src={pokeball} alt="pokeball" />
 	</div>
 
 	<div class="content">
@@ -68,7 +74,13 @@
 		position: absolute;
 		border-radius: 50%;
 		border: none;
+		opacity: 0;
+		transition: 1s;
 		animation: float 8s ease-in-out infinite;
+	}
+
+	.ball.visible {
+		opacity: 1;
 	}
 
 	.ball-1 {
@@ -86,7 +98,7 @@
 		width: 15rem;
 		height: 15rem;
 		border-width: 8px;
-		animation-delay: 1s;
+		animation-duration: 10s;
 		animation-direction: alternate;
 	}
 
@@ -96,7 +108,7 @@
 		width: 5rem;
 		height: 5rem;
 		border-width: 4px;
-		animation-delay: 2s;
+		animation-duration: 5s;
 		animation-direction: alternate-reverse;
 	}
 
@@ -106,7 +118,7 @@
 		width: 7rem;
 		height: 7rem;
 		border-width: 4px;
-		animation-delay: 3s;
+		animation-duration: 18s;
 		animation-direction: reverse;
 	}
 
