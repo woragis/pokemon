@@ -18,6 +18,15 @@ var RedisTTL = int(Window.Seconds())
 func RateLimiter() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ip := c.IP()
+
+		/**************************
+		* In case it uses a proxy *
+		**************************/
+		// ip := c.Get("X-Forwarded-For")
+		// if ip == "" {
+		// 	ip = c.IP()
+		// }
+
 		key := fmt.Sprintf("rate_limit:%s", ip)
 
 		// Increment counter
