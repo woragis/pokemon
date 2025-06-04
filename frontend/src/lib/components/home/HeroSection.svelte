@@ -1,6 +1,6 @@
 <script>
 	import { ChevronRight, Search } from 'lucide-svelte';
-	import pokeball from '$lib/assets/pokeball-logo.png';
+	import pokeball from '$lib/assets/pokeball.png';
 	import { onMount } from 'svelte';
 
 	let visible = false;
@@ -125,7 +125,7 @@
 	@keyframes float {
 		0%,
 		100% {
-			transform: translateY(0px) rotate(-20deg) translateX(0px);
+			transform: translateY(0px) rotate(-50deg) translateX(0px);
 		}
 		50% {
 			transform: translateY(-20px) rotate(30deg) translateX(-15px);
