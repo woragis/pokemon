@@ -1,14 +1,15 @@
 <script>
 	import { ChevronRight, Search } from 'lucide-svelte';
+	import pokeball from '$lib/assets/pokeball-logo.png';
 </script>
 
 <div class="hero">
 	<!-- Decorative Pokeball pattern in the background -->
 	<div class="pokeballs">
-		<div class="ball ball-1"></div>
-		<div class="ball ball-2"></div>
-		<div class="ball ball-3"></div>
-		<div class="ball ball-4"></div>
+		<img class="ball ball-1" src={pokeball} alt="pokeball" />
+		<img class="ball ball-2" src={pokeball} alt="pokeball" />
+		<img class="ball ball-3" src={pokeball} alt="pokeball" />
+		<img class="ball ball-4" src={pokeball} alt="pokeball" />
 	</div>
 
 	<div class="content">
@@ -66,7 +67,7 @@
 	.ball {
 		position: absolute;
 		border-radius: 50%;
-		border: 4px solid white;
+		border: none;
 		animation: float 8s ease-in-out infinite;
 	}
 
@@ -112,10 +113,10 @@
 	@keyframes float {
 		0%,
 		100% {
-			transform: translateY(0px) rotate(0deg) translateX(0px);
+			transform: translateY(0px) rotate(-20deg) translateX(0px);
 		}
 		50% {
-			transform: translateY(-20px) rotate(10deg) translateX(-15px);
+			transform: translateY(-20px) rotate(30deg) translateX(-15px);
 		}
 	}
 	.content {
