@@ -17,6 +17,7 @@
 	} from 'lucide-svelte';
 	import Link from './common/Link.svelte';
 	import { user } from '$lib/store/user';
+	import pokeballLogo from '$lib/assets/pokeball-logo.png';
 
 	let isMenuOpen = false;
 	let isScrolled = false;
@@ -51,9 +52,7 @@
 		<div class="flex h-16 items-center justify-between">
 			<div class="flex items-center">
 				<div class="flex items-center gap-2 text-2xl font-bold text-red-600">
-					<div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-600">
-						<div class="h-3 w-3 rounded-full bg-white"></div>
-					</div>
+					<img src={pokeballLogo} alt="pokeball logo" width="36" />
 					<span>PokéHub</span>
 				</div>
 			</div>
