@@ -1,6 +1,7 @@
 package main
 
 import (
+	"pokemon/cache"
 	"pokemon/database"
 	"pokemon/middleware"
 	"pokemon/routes"
@@ -15,6 +16,7 @@ func main() {
     ws_hub := websocket.NewHub()
 
     database.ConnectDB()
+    cache.InitRedis()
 
     // Logging
     app.Use(logger.New())
