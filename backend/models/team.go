@@ -7,34 +7,53 @@ import (
 	"gorm.io/gorm"
 )
 
-type Team struct {
-	ID        uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-	UserID    uuid.UUID      `gorm:"type:uuid;not null" json:"user_id"`
-	Name      string         `gorm:"not null" json:"name"`
-	Description string       `json:"description"`
-	Public    bool           `gorm:"default:true" json:"public"`
-	Pokemon   []PokemonSlot  `gorm:"foreignKey:TeamID" json:"pokemon"`
+type StatValues struct {
+	HP   int `json:"hp"`
+	Atk  int `json:"atk"`
+	Def  int `json:"def"`
+	SpA  int `json:"spa"`
+	SpD  int `json:"spd"`
+	Spe  int `json:"spe"`
+}
 
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+type Move struct {
+	ID int `json:"id"`
+}
+
+type Moves []Move
+
+type Team struct {
+	ID          uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
+	UserID      uuid.UUID      `gorm:"type:uuid;not null" json:"user_id"`
+	Name        string         `gorm:"not null" json:"name"`
+	Description string         `json:"description"`
+	Public      bool           `gorm:"default:true" json:"public"`
+
+	Pokemon   []PokemonSlot   `gorm:"foreignKey:TeamID" json:"pokemon"`
+
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt time.Time        `json:"updated_at"`
+	DeletedAt gorm.DeletedAt   `gorm:"index" json:"-"`
 }
 
 type PokemonSlot struct {
-	ID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-	TeamID   uuid.UUID `gorm:"type:uuid;not null;index" json:"team_id"`
+	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
+	TeamID      uuid.UUID `gorm:"type:uuid;not null;index" json:"team_id"`
 
-	Slot     int        `gorm:"not null" json:"slot"` // 1-6
-	PokemonName string  `gorm:"not null" json:"pokemon_name"`
-	Level     int       `json:"level"`
-	Ability   string    `json:"ability"`
-	Item      string    `json:"item"`
-	Moves     []string  `gorm:"type:text[]" json:"moves"` // Or serialize as JSON if needed
+	Slot        int       `gorm:"not null" json:"slot"` // 1-6
+	PokemonID   int       `gorm:"not null" json:"pokemon_id"`  // from PokeAPI species
+	PokemonName string    `gorm:"not null" json:"pokemon_name"` // for redundancy/display
 
-	IVs       string    `json:"ivs"`  // can also be a struct if detailed
-	EVs       string    `json:"evs"`
+	Level       int       `gorm:"default:50" json:"level"` // default to level 50
+	NatureID    int       `json:"nature_id"`               // from PokeAPI (optional)
+	Gender      string    `json:"gender"`                  // e.g., "male", "female", "unknown"
 
-	// Optional extra fields like Nature, Gender, etc.
+	Ability     string    `json:"ability"`
+	Item        string    `json:"item"`
+	Moves       Moves     `gorm:"type:jsonb" json:"moves"` // e.g., ["thunderbolt", "surf"]
+
+	IVs         StatValues `gorm:"type:jsonb" json:"ivs"` // map[string]int: {"hp":31,"atk":31,...}
+	EVs         StatValues `gorm:"type:jsonb" json:"evs"` // map[string]int: {"hp":252,"spd":252,...}
 }
 
 /****************
