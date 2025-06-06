@@ -1,5 +1,48 @@
 package config
 
+/*
+Additional Tools To Consider:
+Security & Middleware:
+
+Rate Limiting - Prevent abuse
+CORS - Cross-origin requests
+Helmet - Security headers
+Request ID - Tracing
+
+Monitoring & Logging:
+
+Zap - Structured logging
+Prometheus - Metrics
+Jaeger - Distributed tracing
+
+Database:
+
+Migrate - Database migrations
+Connection pooling - Better performance
+
+Development:
+
+Air - Hot reload
+Swagger - API documentation
+Testify - Better testing
+
+Production:
+
+Graceful shutdown
+Health checks
+Docker - Containerization
+
+Security Best Practices:
+
+Never commit secrets - Use .env files locally, environment variables in production
+Rotate secrets regularly - Especially JWT secrets
+Use different secrets for different environments (dev/staging/prod)
+Validate all inputs - Use the validator package
+Use HTTPS only in production
+Implement proper error handling - Don't leak sensitive info
+Add request timeouts - Prevent resource exhaustion
+*/
+
 import (
 	"log"
 	"os"
