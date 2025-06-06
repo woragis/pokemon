@@ -1,5 +1,27 @@
-// pkg/utils/jwt.go
 package utils
+
+/*
+Key Features:
+Token Management:
+
+✅ Access & Refresh Tokens - Complete token pair system
+✅ Token Validation - Comprehensive validation with proper error handling
+✅ Token Refresh - Secure token refresh mechanism
+✅ Expiry Management - Flexible expiration times
+
+Security Features:
+
+✅ Token Blacklisting - Interface for revoking tokens
+✅ Role-based Access - Built-in role checking
+✅ Proper Error Handling - Specific error types
+✅ Header Extraction - Safe token extraction from headers
+
+Middleware Integration:
+
+✅ Fiber Middleware - Ready-to-use authentication middleware
+✅ Role Middleware - Permission-based access control
+✅ Context Storage - User info stored in request context
+*/
 
 import (
 	"errors"
