@@ -1,5 +1,36 @@
 package utils
 
+/*
+Key Features:
+Enhanced Validation:
+
+✅ Structured Error Messages - User-friendly error responses
+✅ JSON Field Names - Proper field names in errors
+✅ Custom Validators - 10+ custom validation rules
+✅ Helper Functions - Quick validation for common cases
+
+Custom Validators:
+
+🔐 Strong Password - Requires uppercase, lowercase, number, special char
+👤 Username - 3-20 chars, letters/numbers/underscores only
+🔗 Slug - URL-friendly slugs
+🎨 Hex Color - Valid hex color codes (#RRGGBB)
+💳 Credit Card - Luhn algorithm validation
+📱 Phone - International phone format
+🌍 Timezone - Timezone string validation
+📁 File Extension - File extension validation
+📄 MIME Type - MIME type format validation
+
+Ready-to-Use Structs:
+
+📄 PaginationParams - Page, limit, sort validation
+🔍 SearchParams - Search query validation
+📎 FileUploadParams - File upload validation
+📧 ContactInfo - Email, phone, social media
+🏠 Address - Complete address validation
+💰 PaymentInfo - Payment card validation
+*/
+
 import (
 	"errors"
 	"fmt"
