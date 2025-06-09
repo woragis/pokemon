@@ -1,4 +1,4 @@
-package models
+package forum
 
 import (
 	"pokemon/internal/domains/user"
@@ -21,7 +21,7 @@ Let me know if you want threaded replies, reactions (like ❤️ or 😂), or a 
 */
 
 // ForumCategory represents predefined categories like Competitive, General, etc.
-type TopicCategory struct {
+type Category struct {
 	ID    uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	Name  string    `gorm:"uniqueIndex;not null" json:"name"`
 	Color string    `gorm:"not null" json:"color"`
@@ -39,7 +39,7 @@ type Topic struct {
 	Author   user.User `gorm:"foreignKey:AuthorID" json:"author"`
 
 	CategoryID uuid.UUID     `gorm:"type:uuid;not null;index" json:"-"`
-	Category   TopicCategory `gorm:"foreignKey:CategoryID" json:"category"`
+	Category   Category `gorm:"foreignKey:CategoryID" json:"category"`
 
 	Pinned bool `gorm:"default:false" json:"pinned"`
 
