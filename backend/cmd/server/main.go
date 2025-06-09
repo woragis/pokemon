@@ -4,6 +4,7 @@ import (
 	"log"
 	"pokemon/internal/config"
 	"pokemon/internal/database"
+	"pokemon/internal/migrations"
 
 	"pokemon/internal/domains/user"
 	"pokemon/internal/middleware"
@@ -22,6 +23,11 @@ func main() {
     if err != nil {
         log.Fatal("Failed to connect to database:", err)
     }
+
+    // Run database migrations
+    if err := migrations.RunAll(db, migrations.GetAllMigrators()); err != nil {
+		log.Fatal("migration failed:", err)
+	}
     
     // Initialize cache with redis
     redis := database.NewRedis(cfg.RedisURL)
