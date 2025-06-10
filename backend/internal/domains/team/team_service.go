@@ -47,7 +47,20 @@ func (s *service) createTeam(team *Team) error {
 	if err := team.Validate(); err != nil {
 		return fmt.Errorf("validation failed: %w", err)
 	}
-	return s.repo.create(team)
+
+	// Persist to DB
+	if err := s.repo.create(team); err != nil {
+		return err
+	}
+
+	// Cache in Redis
+	ctx := context.Background()
+	jsonData, err := json.Marshal(team)
+	if err == nil {
+		s.redis.Set(ctx, redisTeamKey(team.ID), jsonData, time.Hour)
+	}
+
+	return nil
 }
 
 func (s *service) getTeam(id uuid.UUID) (*Team, error) {
