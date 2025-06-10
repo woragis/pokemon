@@ -30,6 +30,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var (
@@ -43,7 +44,7 @@ var (
 
 // JWTClaims represents the JWT token claims
 type JWTClaims struct {
-    UserID   uint   `json:"user_id"`
+    UserID   uuid.UUID `json:"user_id"`
     Email    string `json:"email"`
     Username string `json:"username,omitempty"`
     Role     string `json:"role,omitempty"`
@@ -79,7 +80,7 @@ type TokenPair struct {
 }
 
 // GenerateTokenPair generates both access and refresh tokens
-func (j *JWTManager) GenerateTokenPair(userID uint, email, username, role string) (*TokenPair, error) {
+func (j *JWTManager) GenerateTokenPair(userID uuid.UUID, email, username, role string) (*TokenPair, error) {
     // Generate access token
     accessToken, accessExp, err := j.generateToken(userID, email, username, role, "access", j.accessTokenExpiry)
     if err != nil {
@@ -102,17 +103,17 @@ func (j *JWTManager) GenerateTokenPair(userID uint, email, username, role string
 }
 
 // GenerateAccessToken generates only an access token
-func (j *JWTManager) GenerateAccessToken(userID uint, email, username, role string) (string, time.Time, error) {
+func (j *JWTManager) GenerateAccessToken(userID uuid.UUID, email, username, role string) (string, time.Time, error) {
     return j.generateToken(userID, email, username, role, "access", j.accessTokenExpiry)
 }
 
 // GenerateRefreshToken generates only a refresh token
-func (j *JWTManager) GenerateRefreshToken(userID uint, email, username, role string) (string, time.Time, error) {
+func (j *JWTManager) GenerateRefreshToken(userID uuid.UUID, email, username, role string) (string, time.Time, error) {
     return j.generateToken(userID, email, username, role, "refresh", j.refreshTokenExpiry)
 }
 
 // generateToken is the internal method to generate tokens
-func (j *JWTManager) generateToken(userID uint, email, username, role, tokenType string, expiry time.Duration) (string, time.Time, error) {
+func (j *JWTManager) generateToken(userID uuid.UUID, email, username, role, tokenType string, expiry time.Duration) (string, time.Time, error) {
     now := time.Now()
     expiresAt := now.Add(expiry)
 
@@ -123,7 +124,7 @@ func (j *JWTManager) generateToken(userID uint, email, username, role, tokenType
         Role:      role,
         TokenType: tokenType,
         RegisteredClaims: jwt.RegisteredClaims{
-            ID:        fmt.Sprintf("%d_%s_%d", userID, tokenType, now.Unix()),
+            ID:        fmt.Sprintf("%s_%s_%d", userID.String(), tokenType, now.Unix()),
             Subject:   fmt.Sprintf("%d", userID),
             Audience:  jwt.ClaimStrings{j.issuer},
             Issuer:    j.issuer,
@@ -278,7 +279,7 @@ func (j *JWTManager) ValidateAndBlacklistCheck(tokenString string, blacklist Bla
 // Legacy functions for backward compatibility
 
 // GenerateJWT generates a simple JWT token (legacy)
-func GenerateJWT(userID uint, email string) (string, error) {
+func GenerateJWT(userID uuid.UUID, email string) (string, error) {
     manager := NewJWTManager("default-secret", 24*time.Hour, 7*24*time.Hour, "default-issuer")
     token, _, err := manager.GenerateAccessToken(userID, email, "", "")
     return token, err
