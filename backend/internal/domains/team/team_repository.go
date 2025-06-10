@@ -5,14 +5,14 @@ import (
 	"gorm.io/gorm"
 )
 
-/*************
- * INTERFACE *
- *************/
+/************************
+ * REPOSITORY INTERFACE *
+ ************************/
 
 type TeamRepository interface {
 	Create(team *Team) error
 	GetByID(id uuid.UUID) (*Team, error)
-	ListByUser(userID uuid.UUID) ([]Team, error)
+	ListByUser(userID uuid.UUID, limit int, offset int) ([]Team, error)
 	Update(team *Team) error
 	Delete(id uuid.UUID) error
 }
@@ -39,9 +39,14 @@ func (r *teamRepository) GetByID(id uuid.UUID) (*Team, error) {
 	return &team, err
 }
 
-func (r *teamRepository) ListByUser(userID uuid.UUID) ([]Team, error) {
+func (r *teamRepository) ListByUser(userID uuid.UUID, limit int, offset int) ([]Team, error) {
 	var teams []Team
-	err := r.db.Preload("Pokemon").Where("user_id = ?", userID).Find(&teams).Error
+	err := r.db.
+		Preload("Pokemon").
+		Limit(limit).
+		Offset(offset).
+		Where("user_id = ?", userID).
+		Find(&teams).Error
 	return teams, err
 }
 
