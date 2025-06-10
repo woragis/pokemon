@@ -6,16 +6,17 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
     Create(ctx context.Context, user *User) error
-    GetByID(ctx context.Context, id uint) (*User, error)
+    GetByID(ctx context.Context, id uuid.UUID) (*User, error)
     GetByEmail(ctx context.Context, email string) (*User, error)
-    Update(ctx context.Context, id uint, updates map[string]interface{}) error
-    Delete(ctx context.Context, id uint) error
+    Update(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error
+    Delete(ctx context.Context, id uuid.UUID) error
     List(ctx context.Context, limit, offset int) ([]*User, error)
 }
 
@@ -35,7 +36,7 @@ func (r *repository) Create(ctx context.Context, user *User) error {
     return r.db.WithContext(ctx).Create(user).Error
 }
 
-func (r *repository) GetByID(ctx context.Context, id uint) (*User, error) {
+func (r *repository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
     // Try to get from cache first
     cacheKey := r.getUserCacheKey(id)
     cached, err := r.redis.Get(ctx, cacheKey).Result()
@@ -63,7 +64,7 @@ func (r *repository) GetByEmail(ctx context.Context, email string) (*User, error
     return &user, err
 }
 
-func (r *repository) Update(ctx context.Context, id uint, updates map[string]interface{}) error {
+func (r *repository) Update(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error {
     err := r.db.WithContext(ctx).Model(&User{}).Where("id = ?", id).Updates(updates).Error
     if err == nil {
         // Invalidate cache
@@ -72,7 +73,7 @@ func (r *repository) Update(ctx context.Context, id uint, updates map[string]int
     return err
 }
 
-func (r *repository) Delete(ctx context.Context, id uint) error {
+func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
     err := r.db.WithContext(ctx).Delete(&User{}, id).Error
     if err == nil {
         // Invalidate cache
@@ -87,7 +88,7 @@ func (r *repository) List(ctx context.Context, limit, offset int) ([]*User, erro
     return users, err
 }
 
-func (r *repository) getUserCacheKey(id uint) string {
+func (r *repository) getUserCacheKey(id uuid.UUID) string {
     return fmt.Sprintf("user:%d", id)
 }
 

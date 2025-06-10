@@ -6,14 +6,15 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
     CreateUser(ctx context.Context, req *CreateUserRequest) (*User, error)
-    GetUser(ctx context.Context, id uint) (*User, error)
-    UpdateUser(ctx context.Context, id uint, req *UpdateUserRequest) (*User, error)
-    DeleteUser(ctx context.Context, id uint) error
+    GetUser(ctx context.Context, id uuid.UUID) (*User, error)
+    UpdateUser(ctx context.Context, id uuid.UUID, req *UpdateUserRequest) (*User, error)
+    DeleteUser(ctx context.Context, id uuid.UUID) error
     ListUsers(ctx context.Context, limit, offset int) ([]*User, error)
     Login(ctx context.Context, req *LoginRequest) (string, error)
 }
@@ -52,11 +53,11 @@ func (s *service) CreateUser(ctx context.Context, req *CreateUserRequest) (*User
     return user, nil
 }
 
-func (s *service) GetUser(ctx context.Context, id uint) (*User, error) {
+func (s *service) GetUser(ctx context.Context, id uuid.UUID) (*User, error) {
     return s.repo.GetByID(ctx, id)
 }
 
-func (s *service) UpdateUser(ctx context.Context, id uint, req *UpdateUserRequest) (*User, error) {
+func (s *service) UpdateUser(ctx context.Context, id uuid.UUID, req *UpdateUserRequest) (*User, error) {
     updates := make(map[string]interface{})
     
     if req.FirstName != nil {
@@ -77,7 +78,7 @@ func (s *service) UpdateUser(ctx context.Context, id uint, req *UpdateUserReques
     return s.repo.GetByID(ctx, id)
 }
 
-func (s *service) DeleteUser(ctx context.Context, id uint) error {
+func (s *service) DeleteUser(ctx context.Context, id uuid.UUID) error {
     return s.repo.Delete(ctx, id)
 }
 
