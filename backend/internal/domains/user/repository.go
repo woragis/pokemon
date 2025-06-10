@@ -11,13 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository interface {
-    Create(ctx context.Context, user *User) error
-    GetByID(ctx context.Context, id uuid.UUID) (*User, error)
-    GetByEmail(ctx context.Context, email string) (*User, error)
-    Update(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error
-    Delete(ctx context.Context, id uuid.UUID) error
-    List(ctx context.Context, limit, offset int) ([]*User, error)
+type userRepository interface {
+    create(ctx context.Context, user *User) error
+    getByID(ctx context.Context, id uuid.UUID) (*User, error)
+    getByEmail(ctx context.Context, email string) (*User, error)
+    update(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error
+    delete(ctx context.Context, id uuid.UUID) error
+    list(ctx context.Context, limit, offset int) ([]*User, error)
 }
 
 type repository struct {
@@ -25,18 +25,18 @@ type repository struct {
     redis *redis.Client
 }
 
-func NewRepository(db *gorm.DB, redis *redis.Client) Repository {
+func newRepository(db *gorm.DB, redis *redis.Client) userRepository {
     return &repository{
         db:    db,
         redis: redis,
     }
 }
 
-func (r *repository) Create(ctx context.Context, user *User) error {
+func (r *repository) create(ctx context.Context, user *User) error {
     return r.db.WithContext(ctx).Create(user).Error
 }
 
-func (r *repository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
+func (r *repository) getByID(ctx context.Context, id uuid.UUID) (*User, error) {
     // Try to get from cache first
     cacheKey := r.getUserCacheKey(id)
     cached, err := r.redis.Get(ctx, cacheKey).Result()
@@ -58,13 +58,13 @@ func (r *repository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
     return &user, nil
 }
 
-func (r *repository) GetByEmail(ctx context.Context, email string) (*User, error) {
+func (r *repository) getByEmail(ctx context.Context, email string) (*User, error) {
     var user User
     err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error
     return &user, err
 }
 
-func (r *repository) Update(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error {
+func (r *repository) update(ctx context.Context, id uuid.UUID, updates map[string]interface{}) error {
     err := r.db.WithContext(ctx).Model(&User{}).Where("id = ?", id).Updates(updates).Error
     if err == nil {
         // Invalidate cache
@@ -73,7 +73,7 @@ func (r *repository) Update(ctx context.Context, id uuid.UUID, updates map[strin
     return err
 }
 
-func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
+func (r *repository) delete(ctx context.Context, id uuid.UUID) error {
     err := r.db.WithContext(ctx).Delete(&User{}, id).Error
     if err == nil {
         // Invalidate cache
@@ -82,7 +82,7 @@ func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
     return err
 }
 
-func (r *repository) List(ctx context.Context, limit, offset int) ([]*User, error) {
+func (r *repository) list(ctx context.Context, limit, offset int) ([]*User, error) {
     var users []*User
     err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&users).Error
     return users, err

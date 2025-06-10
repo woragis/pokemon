@@ -20,7 +20,7 @@ type User struct {
     DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }
 
-type CreateUserRequest struct {
+type createUserRequest struct {
     Email     string `json:"email" validate:"required,email"`
     Username  string `json:"username" validate:"required,min=3,max=20"`
     Password  string `json:"password" validate:"required,min=6"`
@@ -28,13 +28,13 @@ type CreateUserRequest struct {
     LastName  string `json:"last_name" validate:"required"`
 }
 
-type UpdateUserRequest struct {
+type updateUserRequest struct {
     FirstName *string `json:"first_name,omitempty"`
     LastName  *string `json:"last_name,omitempty"`
     Active    *bool   `json:"active,omitempty"`
 }
 
-type LoginRequest struct {
+type loginRequest struct {
     Email    string `json:"email" validate:"required,email"`
     Password string `json:"password" validate:"required"`
 }

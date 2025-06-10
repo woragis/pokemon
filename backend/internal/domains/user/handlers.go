@@ -10,21 +10,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type Handler struct {
-	service Service
+type handler struct {
+	service userService
 }
 
-func NewHandler(db *gorm.DB, redis *redis.Client) *Handler {
-	repo := NewRepository(db, redis)
+func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
+	repo := newRepository(db, redis)
 	service := NewService(repo)
 
-	return &Handler{
+	return &handler{
 		service: service,
 	}
 }
 
-func (h *Handler) CreateUser(c *fiber.Ctx) error {
-	var req CreateUserRequest
+func (h *handler) createUser(c *fiber.Ctx) error {
+	var req createUserRequest
 	if err := c.BodyParser(&req); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid request body")
 	}
@@ -33,7 +33,7 @@ func (h *Handler) CreateUser(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	user, err := h.service.CreateUser(c.Context(), &req)
+	user, err := h.service.createUser(c.Context(), &req)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, err.Error())
 	}
@@ -41,13 +41,13 @@ func (h *Handler) CreateUser(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, fiber.StatusCreated, "User created successfully", user)
 }
 
-func (h *Handler) GetUser(c *fiber.Ctx) error {
+func (h *handler) getUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid UUID format")
 	}
 
-	user, err := h.service.GetUser(c.Context(), id)
+	user, err := h.service.getUser(c.Context(), id)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusNotFound, "User not found")
 	}
@@ -55,18 +55,18 @@ func (h *Handler) GetUser(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, fiber.StatusOK, "User retrieved successfully", user)
 }
 
-func (h *Handler) UpdateUser(c *fiber.Ctx) error {
+func (h *handler) updateUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid UUID format")
 	}
 
-	var req UpdateUserRequest
+	var req updateUserRequest
 	if err := c.BodyParser(&req); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
-	user, err := h.service.UpdateUser(c.Context(), id, &req)
+	user, err := h.service.updateUser(c.Context(), id, &req)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, err.Error())
 	}
@@ -74,13 +74,13 @@ func (h *Handler) UpdateUser(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, fiber.StatusOK, "User updated successfully", user)
 }
 
-func (h *Handler) DeleteUser(c *fiber.Ctx) error {
+func (h *handler) deleteUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid UUID format")
 	}
 
-	err = h.service.DeleteUser(c.Context(), id)
+	err = h.service.deleteUser(c.Context(), id)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, err.Error())
 	}
@@ -88,11 +88,11 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, fiber.StatusOK, "User deleted successfully", nil)
 }
 
-func (h *Handler) ListUsers(c *fiber.Ctx) error {
+func (h *handler) listUsers(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "10"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
 
-	users, err := h.service.ListUsers(c.Context(), limit, offset)
+	users, err := h.service.listUsers(c.Context(), limit, offset)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, err.Error())
 	}
@@ -100,8 +100,8 @@ func (h *Handler) ListUsers(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, fiber.StatusOK, "Users retrieved successfully", users)
 }
 
-func (h *Handler) Login(c *fiber.Ctx) error {
-	var req LoginRequest
+func (h *handler) login(c *fiber.Ctx) error {
+	var req loginRequest
 	if err := c.BodyParser(&req); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid request body")
 	}
@@ -110,7 +110,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	token, err := h.service.Login(c.Context(), &req)
+	token, err := h.service.login(c.Context(), &req)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusUnauthorized, err.Error())
 	}

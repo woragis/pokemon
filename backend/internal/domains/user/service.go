@@ -10,26 +10,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service interface {
-    CreateUser(ctx context.Context, req *CreateUserRequest) (*User, error)
-    GetUser(ctx context.Context, id uuid.UUID) (*User, error)
-    UpdateUser(ctx context.Context, id uuid.UUID, req *UpdateUserRequest) (*User, error)
-    DeleteUser(ctx context.Context, id uuid.UUID) error
-    ListUsers(ctx context.Context, limit, offset int) ([]*User, error)
-    Login(ctx context.Context, req *LoginRequest) (string, error)
+type userService interface {
+    createUser(ctx context.Context, req *createUserRequest) (*User, error)
+    getUser(ctx context.Context, id uuid.UUID) (*User, error)
+    updateUser(ctx context.Context, id uuid.UUID, req *updateUserRequest) (*User, error)
+    deleteUser(ctx context.Context, id uuid.UUID) error
+    listUsers(ctx context.Context, limit, offset int) ([]*User, error)
+    login(ctx context.Context, req *loginRequest) (string, error)
 }
 
 type service struct {
-    repo Repository
+    repo userRepository
 }
 
-func NewService(repo Repository) Service {
+func NewService(repo userRepository) userService {
     return &service{
         repo: repo,
     }
 }
 
-func (s *service) CreateUser(ctx context.Context, req *CreateUserRequest) (*User, error) {
+func (s *service) createUser(ctx context.Context, req *createUserRequest) (*User, error) {
     // Hash password
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
     if err != nil {
@@ -45,7 +45,7 @@ func (s *service) CreateUser(ctx context.Context, req *CreateUserRequest) (*User
         Active:    true,
     }
     
-    err = s.repo.Create(ctx, user)
+    err = s.repo.create(ctx, user)
     if err != nil {
         return nil, err
     }
@@ -53,11 +53,11 @@ func (s *service) CreateUser(ctx context.Context, req *CreateUserRequest) (*User
     return user, nil
 }
 
-func (s *service) GetUser(ctx context.Context, id uuid.UUID) (*User, error) {
-    return s.repo.GetByID(ctx, id)
+func (s *service) getUser(ctx context.Context, id uuid.UUID) (*User, error) {
+    return s.repo.getByID(ctx, id)
 }
 
-func (s *service) UpdateUser(ctx context.Context, id uuid.UUID, req *UpdateUserRequest) (*User, error) {
+func (s *service) updateUser(ctx context.Context, id uuid.UUID, req *updateUserRequest) (*User, error) {
     updates := make(map[string]interface{})
     
     if req.FirstName != nil {
@@ -70,24 +70,24 @@ func (s *service) UpdateUser(ctx context.Context, id uuid.UUID, req *UpdateUserR
         updates["active"] = *req.Active
     }
     
-    err := s.repo.Update(ctx, id, updates)
+    err := s.repo.update(ctx, id, updates)
     if err != nil {
         return nil, err
     }
     
-    return s.repo.GetByID(ctx, id)
+    return s.repo.getByID(ctx, id)
 }
 
-func (s *service) DeleteUser(ctx context.Context, id uuid.UUID) error {
-    return s.repo.Delete(ctx, id)
+func (s *service) deleteUser(ctx context.Context, id uuid.UUID) error {
+    return s.repo.delete(ctx, id)
 }
 
-func (s *service) ListUsers(ctx context.Context, limit, offset int) ([]*User, error) {
-    return s.repo.List(ctx, limit, offset)
+func (s *service) listUsers(ctx context.Context, limit, offset int) ([]*User, error) {
+    return s.repo.list(ctx, limit, offset)
 }
 
-func (s *service) Login(ctx context.Context, req *LoginRequest) (string, error) {
-    user, err := s.repo.GetByEmail(ctx, req.Email)
+func (s *service) login(ctx context.Context, req *loginRequest) (string, error) {
+    user, err := s.repo.getByEmail(ctx, req.Email)
     if err != nil {
         return "", errors.New("invalid credentials")
     }
