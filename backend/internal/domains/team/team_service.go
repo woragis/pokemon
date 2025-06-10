@@ -1,57 +1,111 @@
 package team
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 )
 
 /*********************
  * SERVICE INTERFACE *
  *********************/
 
-type TeamService interface {
-	CreateTeam(team *Team) error
-	GetTeam(id uuid.UUID) (*Team, error)
-	ListTeams(userID uuid.UUID) ([]Team, error)
-	UpdateTeam(team *Team) error
-	DeleteTeam(id uuid.UUID) error
+type teamService interface {
+	createTeam(team *Team) error
+	getTeam(id uuid.UUID) (*Team, error)
+	listTeams(userID uuid.UUID, limit int, offset int) ([]Team, error)
+	updateTeam(team *Team) error
+	deleteTeam(id uuid.UUID) error
+}
+
+/********************
+ * REDIS KEY UTILS  *
+ ********************/
+
+func redisTeamKey(id uuid.UUID) string {
+	return fmt.Sprintf("team:%s", id.String())
 }
 
 /**************************
  * SERVICE IMPLEMENTATION *
  **************************/
 
-type teamService struct {
-	repo TeamRepository
+type service struct {
+	repo  teamRepository
+	redis *redis.Client
 }
 
-func NewTeamService(repo TeamRepository) TeamService {
-	return &teamService{repo}
+func NewTeamService(repo teamRepository, redis *redis.Client) teamService {
+	return &service{repo: repo, redis: redis}
 }
 
-func (s *teamService) CreateTeam(team *Team) error {
+func (s *service) createTeam(team *Team) error {
 	if err := team.Validate(); err != nil {
 		return fmt.Errorf("validation failed: %w", err)
 	}
-	return s.repo.Create(team)
+	return s.repo.create(team)
 }
 
-func (s *teamService) GetTeam(id uuid.UUID) (*Team, error) {
-	return s.repo.GetByID(id)
+func (s *service) getTeam(id uuid.UUID) (*Team, error) {
+	ctx := context.Background()
+	key := redisTeamKey(id)
+
+	// Try Redis
+	val, err := s.redis.Get(ctx, key).Result()
+	if err == nil {
+		var cached Team
+		if err := json.Unmarshal([]byte(val), &cached); err == nil {
+			return &cached, nil
+		}
+	}
+
+	// Fallback to DB
+	team, err := s.repo.getByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store in Redis
+	if jsonData, err := json.Marshal(team); err == nil {
+		s.redis.Set(ctx, key, jsonData, time.Hour)
+	}
+
+	return team, nil
 }
 
-func (s *teamService) ListTeams(userID uuid.UUID) ([]Team, error) {
-	return s.repo.ListByUser(userID)
+func (s *service) listTeams(userID uuid.UUID, limit int, offset int) ([]Team, error) {
+	// For simplicity, this skips Redis. Optional: cache with a key like `team:list:<user>:<offset>:<limit>`
+	return s.repo.listByUser(userID, limit, offset)
 }
 
-func (s *teamService) UpdateTeam(team *Team) error {
+func (s *service) updateTeam(team *Team) error {
 	if err := team.Validate(); err != nil {
 		return fmt.Errorf("validation failed: %w", err)
 	}
-	return s.repo.Update(team)
+
+	err := s.repo.update(team)
+	if err != nil {
+		return err
+	}
+
+	// Invalidate Redis
+	s.redis.Del(context.Background(), redisTeamKey(team.ID))
+
+	return nil
 }
 
-func (s *teamService) DeleteTeam(id uuid.UUID) error {
-	return s.repo.Delete(id)
+func (s *service) deleteTeam(id uuid.UUID) error {
+	err := s.repo.delete(id)
+	if err != nil {
+		return err
+	}
+
+	// Invalidate Redis
+	s.redis.Del(context.Background(), redisTeamKey(id))
+
+	return nil
 }
