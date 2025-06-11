@@ -29,7 +29,7 @@ type teamInteractionRepository interface {
 	// Comments
 	createComment(comment *TeamComment) error
 	updateComment(comment *TeamComment) error
-	deleteComment(id uuid.UUID) error
+	deleteComment(userID, commentID uuid.UUID) error
 	getComments(teamID uuid.UUID, limit int, offset int) ([]TeamComment, error)
 	countComments(teamID uuid.UUID) (int64, error)
 }
@@ -118,8 +118,8 @@ func (r *interactionRepository) updateComment(comment *TeamComment) error {
 	return r.db.Save(comment).Error
 }
 
-func (r *interactionRepository) deleteComment(id uuid.UUID) error {
-	return r.db.Delete(&TeamComment{}, "id = ?", id).Error
+func (r *interactionRepository) deleteComment(userID, commentID uuid.UUID) error {
+	return r.db.Delete(&TeamComment{}, "id = ? AND user_id = ?", userID, commentID).Error
 }
 
 func (r *interactionRepository) getComments(teamID uuid.UUID, limit int, offset int) ([]TeamComment, error) {

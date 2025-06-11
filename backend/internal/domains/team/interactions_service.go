@@ -22,14 +22,14 @@ type teamInteractionService interface {
 
 	saveTeam(userID, teamID uuid.UUID) error
 	unsaveTeam(userID, teamID uuid.UUID) error
-	getSavedTeams(userID, limit, offset int) ([]TeamSave, error)
+	getSavedTeams(userID uuid.UUID, limit, offset int) ([]TeamSave, error)
 	isTeamSavedByUser(userID, teamID uuid.UUID) (bool, error)
 
 	commentTeam(userID, teamID uuid.UUID, content string, parentID *uuid.UUID) error
 	getTeamComments(teamID uuid.UUID, limit, offset int) ([]TeamComment, error)
 	getTeamCommentCount(teamID uuid.UUID) (int64, error)
 	updateComment(comment *TeamComment) error
-	deleteComment(id uuid.UUID) error
+	deleteComment(userID, commentID uuid.UUID) error
 }
 
 /******************************
@@ -41,7 +41,7 @@ type interactionService struct {
 	redis *redis.Client
 }
 
-func newInteractionService(repo teamInteractionRepository, redis *redis.Client) *interactionService {
+func newInteractionService(repo teamInteractionRepository, redis *redis.Client) teamInteractionService {
 	return &interactionService{repo, redis}
 }
 
@@ -203,10 +203,10 @@ func (s *interactionService) updateComment(comment *TeamComment) error {
     return err
 }
 
-func (s *interactionService) deleteComment(id uuid.UUID) error {
-    err := s.repo.deleteComment(id)
+func (s *interactionService) deleteComment(userID, commentID uuid.UUID) error {
+    err := s.repo.deleteComment(userID, commentID)
     if err == nil {
-        s.invalidateCache(cacheKey("team:comments", id))
+        s.invalidateCache(cacheKey("team:comments", commentID))
     }
     return err
 }
