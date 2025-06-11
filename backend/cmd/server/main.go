@@ -5,13 +5,13 @@ import (
 	"pokemon/internal/config"
 	"pokemon/internal/database"
 	"pokemon/internal/migrations"
+	"pokemon/pkg/utils"
 
 	"pokemon/internal/domains/team"
 	"pokemon/internal/domains/user"
 	"pokemon/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
@@ -37,14 +37,12 @@ func main() {
     app := fiber.New(fiber.Config{
         ErrorHandler: middleware.ErrorHandler,
     })
+
+    c := config.Load()
     
     // Global middleware
     app.Use(logger.New())
-    app.Use(cors.New(cors.Config{
-        AllowMethods: "GET,POST,PUT,DELETE",
-        AllowHeaders: "Content-Type,Authorization",
-        AllowOrigins: "http://localhost:5173",
-    }))
+    app.Use(utils.SetupCors(c))
     
     // API routes
     api := app.Group("/api/v1")
