@@ -39,7 +39,7 @@ type service struct {
 	redis *redis.Client
 }
 
-func newTeamService(repo teamRepository, redis *redis.Client) teamService {
+func newService(repo teamRepository, redis *redis.Client) teamService {
 	return &service{repo: repo, redis: redis}
 }
 
