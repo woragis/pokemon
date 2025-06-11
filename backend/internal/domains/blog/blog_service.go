@@ -17,7 +17,8 @@ import (
 type postService interface {
 	createPost(post *Post) error
 	getPost(id uuid.UUID) (*Post, error)
-	listPosts(userID uuid.UUID, limit int, offset int) ([]Post, error)
+	listPostsByUser(userID uuid.UUID, limit int, offset int) ([]Post, error)
+	listPosts(limit int, offset int) ([]Post, error)
 	updatePost(post *Post) error
 	deletePost(id uuid.UUID) error
 }
@@ -86,8 +87,12 @@ func (s *service) getPost(id uuid.UUID) (*Post, error) {
 	return post, nil
 }
 
-func (s *service) listPosts(userID uuid.UUID, limit int, offset int) ([]Post, error) {
+func (s *service) listPostsByUser(userID uuid.UUID, limit int, offset int) ([]Post, error) {
 	return s.repo.listByUser(userID, limit, offset)
+}
+
+func (s *service) listPosts(limit int, offset int) ([]Post, error) {
+	return s.repo.list(limit, offset)
 }
 
 func (s *service) updatePost(post *Post) error {
