@@ -11,7 +11,7 @@ type handler struct {
 	s favoritepokemonService
 }
 
-func newFavoritePokemonHandler(db *gorm.DB, redis *redis.Client) *handler {
+func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
 	repo := newFavoritePokemonRepository(db)
 	service := newFavoritePokemonService(repo, redis)
 	return &handler{s: service}
