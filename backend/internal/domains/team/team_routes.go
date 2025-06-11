@@ -6,14 +6,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterTeamRoutes(app *fiber.App, handler TeamHandler) {
+func (handler *handler) RegisterRoutes(app fiber.Router) {
 	teamGroup := app.Group("/teams")
 
-	teamGroup.Get("/:id", handler.GetTeam)
-	teamGroup.Get("/user/:user_id", handler.ListTeams)
+	teamGroup.Get("/:id", handler.getTeam)
+	teamGroup.Get("/user/:user_id", handler.listTeams)
 
 	teamGroup.Use(middleware.AuthRequired())
-	teamGroup.Post("/", handler.CreateTeam)
-	teamGroup.Put("/:id", handler.UpdateTeam)
-	teamGroup.Delete("/:id", handler.DeleteTeam)
+	teamGroup.Post("/", handler.createTeam)
+	teamGroup.Put("/:id", handler.updateTeam)
+	teamGroup.Delete("/:id", handler.deleteTeam)
 }
