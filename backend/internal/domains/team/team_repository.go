@@ -25,7 +25,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewTeamRepository(db *gorm.DB) teamRepository {
+func newRepository(db *gorm.DB) teamRepository {
 	return &repository{db}
 }
 
