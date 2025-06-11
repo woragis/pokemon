@@ -11,6 +11,89 @@ import (
  * HANDLER IMPLEMENTATION  *
  **************************/
 
+// POST /teams/:id/save
+func (h *handler) saveTeam(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	if err := h.i.saveTeam(userID, teamID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.SendStatus(fiber.StatusCreated)
+}
+
+// DELETE /teams/:id/save
+func (h *handler) unsaveTeam(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	if err := h.i.unsaveTeam(userID, teamID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
+// GET /teams/saved
+func (h *handler) getSavedTeams(c *fiber.Ctx) error {
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	limit := c.QueryInt("limit", 10)
+	if limit < 1 {
+		limit = 10
+	}
+
+	offset := c.QueryInt("offset", 0)
+	if offset < 0 {
+		offset = 0
+	}
+
+	teams, err := h.i.getSavedTeams(userID, limit, offset)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(teams)
+}
+
+// GET /teams/:id/saved
+func (h *handler) isTeamSavedByUser(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	saved, err := h.i.isTeamSavedByUser(userID, teamID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"saved": saved})
+}
+
 // POST /teams/:id/comments
 func (h *handler) commentTeam(c *fiber.Ctx) error {
 	teamID, err := uuid.Parse(c.Params("id"))
