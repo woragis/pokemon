@@ -1,7 +1,9 @@
 package blog
 
 import (
+	"errors"
 	"pokemon/internal/domains/user"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,4 +38,32 @@ type Response struct {
 	Views        int64     `json:"views"`      // total views
 	Category     string    `json:"category"`   // category name or slug
 	Pinned       bool      `json:"pinned"`     // pinned to top?
+}
+
+/***************
+ * VALIDATIONS *
+ ***************/
+
+func (p *Post) Validate() error {
+	// Trim spaces to avoid " " being accepted
+	p.Title = strings.TrimSpace(p.Title)
+	p.Content = strings.TrimSpace(p.Content)
+
+	if p.Title == "" {
+		return errors.New("title is required")
+	}
+	if len(p.Title) > 200 {
+		return errors.New("title cannot be longer than 200 characters")
+	}
+
+	if p.Content == "" {
+		return errors.New("content is required")
+	}
+
+	// Check if AuthorID is zero (all zeros UUID means not set)
+	if p.AuthorID == uuid.Nil {
+		return errors.New("author_id is required and must be valid")
+	}
+
+	return nil
 }
