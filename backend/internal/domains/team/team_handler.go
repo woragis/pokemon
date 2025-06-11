@@ -7,18 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-/*********************
- * HANDLER INTERFACE *
- *********************/
-
-type teamHandler interface {
-	createTeam(c *fiber.Ctx) error
-	getTeam(c *fiber.Ctx) error
-	listTeams(c *fiber.Ctx) error
-	updateTeam(c *fiber.Ctx) error
-	deleteTeam(c *fiber.Ctx) error
-}
-
 /**************************
  * HANDLER IMPLEMENTATION *
  **************************/
@@ -27,9 +15,9 @@ type teamHandler interface {
 	service teamService
 }
 
-func NewTeamHandler(db *gorm.DB, redis *redis.Client) teamHandler {
-	repo := NewTeamRepository(db)
-	service := newTeamService(repo, redis)
+func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
+	repo := newRepository(db)
+	service := newService(repo, redis)
 	return &handler{service}
 }
 
