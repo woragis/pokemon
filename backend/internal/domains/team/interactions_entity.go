@@ -31,6 +31,7 @@ type TeamSave struct {
 	ID     uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	UserID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_user_team_save" json:"user_id"`
 	TeamID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_user_team_save" json:"team_id"`
+	Team   Team      `gorm:"foreignKey:TeamID" json:"team"`
 }
 
 // --- Team Comment with nesting support ---
