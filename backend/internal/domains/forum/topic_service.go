@@ -1,6 +1,7 @@
 package forum
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -10,7 +11,7 @@ import (
 type topicService interface {
 	create(topic *Topic) error
 	getByID(id string) (*Topic, error)
-	update(id string, updates map[string]interface{}) error
+	update(topic *Topic) error
 	delete(id string) error
 	listByUser(userID uuid.UUID, limit, offset int) ([]Topic, error)
 	list(limit, offset int) ([]Topic, error)
@@ -19,6 +20,10 @@ type topicService interface {
 type service struct {
 	repo topicRepository
 	redis *redis.Client
+}
+
+func redisTopicKey(ID uuid.UUID) string {
+	return fmt.Sprintf("topic:%s", ID)
 }
 
 func newTopicService(repo topicRepository, redis *redis.Client) topicService {
@@ -37,33 +42,20 @@ func (s *service) getByID(id string) (*Topic, error) {
 	return s.repo.getByID(uid)
 }
 
-func (s *service) update(id string, updates map[string]interface{}) error {
-	uid, err := uuid.Parse(id)
-	if err != nil {
-		return fmt.Errorf("invalid UUID: %w", err)
+func (s *service) update(topic *Topic) error {
+	if err := topic.Validate(); err != nil {
+		return fmt.Errorf("validation failed: %w", err)
 	}
 
-	topic, err := s.repo.getByID(uid)
+	err := s.repo.update(topic)
 	if err != nil {
 		return err
 	}
 
-	// apply updates to topic model
-	for key, value := range updates {
-		switch key {
-		case "title":
-			if v, ok := value.(string); ok {
-				topic.Title = v
-			}
-		case "content":
-			if v, ok := value.(string); ok {
-				topic.Content = v
-			}
-		// Add more fields here as needed
-		}
-	}
+	// Invalidate Redis
+	s.redis.Del(context.Background(), redisTopicKey(topic.ID))
 
-	return s.repo.update(topic)
+	return nil
 }
 
 func (s *service) delete(id string) error {
