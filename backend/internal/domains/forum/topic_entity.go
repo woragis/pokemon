@@ -1,7 +1,9 @@
 package forum
 
 import (
+	"errors"
 	"pokemon/internal/domains/user"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,4 +40,33 @@ type Response struct {
 	Views        int64     `json:"views"`
 	Category     string    `json:"category"`
 	Pinned       bool      `json:"pinned"`
+}
+
+func (t *Topic) Validate() error {
+	// Normalize input
+	t.Title = strings.TrimSpace(t.Title)
+	t.Content = strings.TrimSpace(t.Content)
+
+	// Title validations
+	if t.Title == "" {
+		return errors.New("title is required")
+	}
+	if len(t.Title) > 200 {
+		return errors.New("title cannot be longer than 200 characters")
+	}
+
+	// Content validations
+	if t.Content == "" {
+		return errors.New("content is required")
+	}
+	if len(t.Content) > 5000 {
+		return errors.New("content cannot be longer than 5000 characters")
+	}
+
+	// UserID must be valid
+	if t.UserID == uuid.Nil {
+		return errors.New("user_id is required and must be valid")
+	}
+
+	return nil
 }
