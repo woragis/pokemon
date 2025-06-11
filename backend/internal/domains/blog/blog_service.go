@@ -21,6 +21,23 @@ type postService interface {
 	listPosts(limit int, offset int) ([]Post, error)
 	updatePost(post *Post) error
 	deletePost(id uuid.UUID) error
+	// searchPosts(query string, limit int, offset int) ([]Post, error)
+	// listPostsByTag(tag string, limit int, offset int) ([]Post, error)
+	// listRecentPosts(limit int) ([]Post, error)
+	// softDeletePost(id uuid.UUID) error
+	// restorePost(id uuid.UUID) error
+	// listDeletedPosts(limit int, offset int) ([]Post, error)
+	// listReportedPosts(limit int, offset int) ([]Post, error)
+	// isUserPostAuthor(postID, userID uuid.UUID) (bool, error)
+	// countPostsByUser(userID uuid.UUID) (int, error)
+	// countTotalPosts() (int, error)
+	// archivePost(id uuid.UUID) error
+	// restorePost(id uuid.UUID) error
+	// postExists(id uuid.UUID) (bool, error)
+
+	// incrementPostViewCount(id uuid.UUID) error
+	// likePost(userID uuid.UUID, postID uuid.UUID) error
+	// unlikePost(userID uuid.UUID, postID uuid.UUID) error
 }
 
 func redisPostKey(id uuid.UUID) string {
