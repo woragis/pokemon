@@ -8,6 +8,7 @@ import (
 	"pokemon/pkg/utils"
 
 	"pokemon/internal/domains/blog"
+	"pokemon/internal/domains/forum"
 	"pokemon/internal/domains/team"
 	"pokemon/internal/domains/user"
 	"pokemon/internal/middleware"
@@ -52,6 +53,7 @@ func main() {
     user.NewHandler(db, redis).RegisterRoutes(api)
     team.NewHandler(db, redis).RegisterRoutes(api)
     blog.NewHandler(db, redis).RegisterRoutes(api)
+    forum.NewHandler(db, redis).RegisterRoutes(api)
     
     log.Fatal(app.Listen(":" + cfg.Port))
 }
