@@ -13,6 +13,7 @@ type blogRepository interface {
 	create(post *Post) error
 	getByID(id uuid.UUID) (*Post, error)
 	listByUser(userID uuid.UUID, limit int, offset int) ([]Post, error)
+	list(limit int, offset int) ([]Post, error)
 	update(post *Post) error
 	delete(id uuid.UUID) error
 }
@@ -46,6 +47,17 @@ func (r *repository) listByUser(userID uuid.UUID, limit int, offset int) ([]Post
 		Limit(limit).
 		Offset(offset).
 		Where("user_id = ?", userID).
+		Find(&posts).Error
+	return posts, err
+}
+
+func (r *repository) list(limit int, offset int) ([]Post, error) {
+	var posts []Post
+	err := r.db.
+		Preload("Author").
+		Limit(limit).
+		Offset(offset).
+		Order("created_at ASC").
 		Find(&posts).Error
 	return posts, err
 }
