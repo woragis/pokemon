@@ -6,6 +6,7 @@ import (
 	"pokemon/internal/database"
 	"pokemon/internal/migrations"
 
+	"pokemon/internal/domains/team"
 	"pokemon/internal/domains/user"
 	"pokemon/internal/middleware"
 
@@ -50,6 +51,7 @@ func main() {
     
     // Initialize domains
     user.NewHandler(db, redis).RegisterRoutes(api)
+    team.NewHandler(db, redis).RegisterRoutes(api)
     
     log.Fatal(app.Listen(":" + cfg.Port))
 }
