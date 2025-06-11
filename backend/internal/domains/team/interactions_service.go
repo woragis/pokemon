@@ -1,6 +1,7 @@
 package team
 
 import (
+	"pokemon/pkg/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -54,7 +55,7 @@ func (s *interactionService) likeTeam(userID, teamID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	s.invalidateCache(cacheKey("team:likes", teamID))
+	utils.InvalidateCache(s.redis, utils.CacheKey("team:likes", teamID))
 	return nil
 }
 
@@ -63,13 +64,13 @@ func (s *interactionService) unlikeTeam(userID, teamID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	s.invalidateCache(cacheKey("team:likes", teamID))
+	utils.InvalidateCache(s.redis, utils.CacheKey("team:likes", teamID))
 	return nil
 }
 
 func (s *interactionService) getTeamLikeCount(teamID uuid.UUID) (int64, error) {
-	key := cacheKey("team:likes", teamID)
-	count, err := s.getCachedCount(key)
+	key := utils.CacheKey("team:likes", teamID)
+	count, err := utils.GetCachedCount(s.redis, key)
 	if err != nil {
 		return 0, err
 	}
@@ -80,7 +81,7 @@ func (s *interactionService) getTeamLikeCount(teamID uuid.UUID) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	_ = s.setCachedCount(key, count)
+	_ = utils.SetCachedCount(s.redis, key, count)
 	return count, nil
 }
 
@@ -104,13 +105,13 @@ func (s *interactionService) viewTeam(userID *uuid.UUID, teamID uuid.UUID) error
 	if err != nil {
 		return err
 	}
-	s.invalidateCache(cacheKey("team:views", teamID))
+	utils.InvalidateCache(s.redis, utils.CacheKey("team:views", teamID))
 	return nil
 }
 
 func (s *interactionService) getTeamViewCount(teamID uuid.UUID) (int64, error) {
-	key := cacheKey("team:views", teamID)
-	count, err := s.getCachedCount(key)
+	key := utils.CacheKey("team:views", teamID)
+	count, err := utils.GetCachedCount(s.redis, key)
 	if err != nil {
 		return 0, err
 	}
@@ -121,7 +122,7 @@ func (s *interactionService) getTeamViewCount(teamID uuid.UUID) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	_ = s.setCachedCount(key, count)
+	_ = utils.SetCachedCount(s.redis, key, count)
 	return count, nil
 }
 
@@ -134,7 +135,7 @@ func (s *interactionService) saveTeam(userID, teamID uuid.UUID) error {
     if err != nil {
         return err
     }
-    s.invalidateCache(cacheKey("team:saves", teamID))
+    utils.InvalidateCache(s.redis, utils.CacheKey("team:saves", teamID))
     return nil
 }
 
@@ -143,7 +144,7 @@ func (s *interactionService) unsaveTeam(userID, teamID uuid.UUID) error {
     if err != nil {
         return err
     }
-    s.invalidateCache(cacheKey("team:saves", teamID))
+    utils.InvalidateCache(s.redis, utils.CacheKey("team:saves", teamID))
     return nil
 }
 
@@ -170,7 +171,7 @@ func (s *interactionService) commentTeam(userID, teamID uuid.UUID, content strin
 	if err != nil {
 		return err
 	}
-	s.invalidateCache(cacheKey("team:comments", teamID))
+	utils.InvalidateCache(s.redis, utils.CacheKey("team:comments", teamID))
 	return nil
 }
 
@@ -179,8 +180,8 @@ func (s *interactionService) getTeamComments(teamID uuid.UUID, limit, offset int
 }
 
 func (s *interactionService) getTeamCommentCount(teamID uuid.UUID) (int64, error) {
-	key := cacheKey("team:comments", teamID)
-	count, err := s.getCachedCount(key)
+	key := utils.CacheKey("team:comments", teamID)
+	count, err := utils.GetCachedCount(s.redis, key)
 	if err != nil {
 		return 0, err
 	}
@@ -191,14 +192,14 @@ func (s *interactionService) getTeamCommentCount(teamID uuid.UUID) (int64, error
 	if err != nil {
 		return 0, err
 	}
-	_ = s.setCachedCount(key, count)
+	_ = utils.SetCachedCount(s.redis, key, count)
 	return count, nil
 }
 
 func (s *interactionService) updateComment(comment *TeamComment) error {
     err := s.repo.updateComment(comment)
     if err == nil {
-        s.invalidateCache(cacheKey("team:comments", comment.TeamID))
+        utils.InvalidateCache(s.redis, utils.CacheKey("team:comments", comment.TeamID))
     }
     return err
 }
@@ -206,7 +207,7 @@ func (s *interactionService) updateComment(comment *TeamComment) error {
 func (s *interactionService) deleteComment(userID, commentID uuid.UUID) error {
     err := s.repo.deleteComment(userID, commentID)
     if err == nil {
-        s.invalidateCache(cacheKey("team:comments", commentID))
+        utils.InvalidateCache(s.redis, utils.CacheKey("team:comments", commentID))
     }
     return err
 }
