@@ -209,3 +209,110 @@ func (h *handler) deleteComment(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+// POST /teams/:id/like
+func (h *handler) likeTeam(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	if err := h.i.likeTeam(userID, teamID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.SendStatus(fiber.StatusCreated)
+}
+
+// DELETE /teams/:id/like
+func (h *handler) unlikeTeam(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	if err := h.i.unlikeTeam(userID, teamID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
+// GET /teams/:id/likes/count
+func (h *handler) getTeamLikeCount(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	count, err := h.i.getTeamLikeCount(teamID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"likes": count})
+}
+
+// GET /teams/:id/likes
+func (h *handler) isTeamLikedByUser(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	liked, err := h.i.isTeamLikedByUser(userID, teamID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"liked": liked})
+}
+
+// POST /teams/:id/view
+func (h *handler) viewTeam(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	var userID *uuid.UUID
+	if id, err := utils.GetUserIDFromLocals(c); err == nil {
+		userID = &id
+	}
+
+	if err := h.i.viewTeam(userID, teamID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.SendStatus(fiber.StatusCreated)
+}
+
+// GET /teams/:id/views/count
+func (h *handler) getTeamViewCount(c *fiber.Ctx) error {
+	teamID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid team ID"})
+	}
+
+	count, err := h.i.getTeamViewCount(teamID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"views": count})
+}
