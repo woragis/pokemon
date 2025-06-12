@@ -13,9 +13,7 @@ func (h *handler) RegisterRoutes(app fiber.Router) {
 	topicGroup.Get("/", h.listTopic)
 	topicGroup.Get("/user/:user_id", h.listTopicByUser)
 	topicGroup.Get("/:id", h.getTopicByID)
-
 	topicGroup.Use(middleware.AuthRequired())
-
 	topicGroup.Post("/", h.createTopic)
 	topicGroup.Put("/:id", h.updateTopic)
 	topicGroup.Delete("/:id", h.deleteTopic)
@@ -23,22 +21,21 @@ func (h *handler) RegisterRoutes(app fiber.Router) {
 	categoryGroup := forumGroup.Group("/categories")
 	categoryGroup.Get("/", h.listCategories)
 	categoryGroup.Get("/:id", h.getCategoryByID)
-
 	categoryGroup.Use(middleware.AuthRequired())
-
 	categoryGroup.Post("/", h.createCategory)
 	categoryGroup.Put("/:id", h.updateCategory)
 	categoryGroup.Delete("/:id", h.deleteCategory)
 
-	// commentGroup := forumGroup.Group("/comments")
-	// commentGroup.Get("/", h)
-	// commentGroup.Get("/:id", h.getCategoryByID)
+	commentGroup := forumGroup.Group("/topic/:topic_id/comments")
+	commentGroup.Get("/", h.getComments)
+	commentGroup.Get("/count", h.countComments)
+	commentGroup.Use(middleware.AuthRequired())
+	commentGroup.Post("/", h.createComment)
 
-	// commentGroup.Use(middleware.AuthRequired())
-
-	// commentGroup.Post("/", h.createCategory)
-	// commentGroup.Put("/:id", h.updateCategory)
-	// commentGroup.Delete("/:id", h.deleteCategory)
+	singleCommentGroup := forumGroup.Group("/comments")
+	singleCommentGroup.Use(middleware.AuthRequired())
+	singleCommentGroup.Put("/:comment_id", h.updateComment)
+	singleCommentGroup.Delete("/:comment_id", h.deleteComment)
 
 	commentLikeGroup := forumGroup.Group("/comments/:comment_id/likes")
 	commentLikeGroup.Get("/", h.getLikes)                    // get all likes for comment (or user-specific if JWT)
