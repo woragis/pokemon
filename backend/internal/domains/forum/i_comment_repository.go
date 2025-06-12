@@ -15,6 +15,7 @@ type topicCommentRepository interface {
 	update(c *TopicComment) error
 	delete(id uuid.UUID) error
 	listByTopic(topicID uuid.UUID) ([]TopicComment, error)
+	count(topicID uuid.UUID) (int64, error)
 }
 
 type topicCommentRepositoryImpl struct {
@@ -58,4 +59,12 @@ func (r *topicCommentRepositoryImpl) listByTopic(topicID uuid.UUID) ([]TopicComm
 		Order("created_at ASC").
 		Find(&comments).Error
 	return comments, err
+}
+
+func (r *topicCommentRepositoryImpl) count(topicID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.
+		Where("topic_id = ?", topicID).
+		Count(&count).Error
+	return count, err
 }
