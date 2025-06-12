@@ -20,6 +20,7 @@ type topicCommentService interface {
 	update(c *TopicComment) error
 	delete(id uuid.UUID) error
 	listByTopic(topicID uuid.UUID) ([]TopicComment, error)
+	countByTopic(topicID uuid.UUID) (int64, error)
 }
 
 type topicCommentServiceImpl struct {
@@ -50,9 +51,13 @@ func (s *topicCommentServiceImpl) create(c *TopicComment) error {
 	return nil
 }
 
+func redisTopicCommentKey(commentID uuid.UUID) string {
+	return fmt.Sprintf("forum:comment:%s", commentID)
+}
+
 func (s *topicCommentServiceImpl) getByID(id uuid.UUID) (*TopicComment, error) {
 	ctx := context.Background()
-	key := redisTopicCommentsKey(id)
+	key := redisTopicCommentKey(id)
 
 	// Try Redis first
 	val, err := s.redis.Get(ctx, key).Result()
@@ -84,6 +89,7 @@ func (s *topicCommentServiceImpl) update(c *TopicComment) error {
 
 	// Invalidate both single comment and topic comment list
 	s.redis.Del(ctx, redisTopicCommentsKey(c.TopicID))
+	s.redis.Del(ctx, redisTopicCommentKey(c.ID))
 	return nil
 }
 
@@ -100,7 +106,34 @@ func (s *topicCommentServiceImpl) delete(id uuid.UUID) error {
 
 	ctx := context.Background()
 	s.redis.Del(ctx, redisTopicCommentsKey(comment.TopicID))
+	s.redis.Del(ctx, redisTopicCommentKey(id))
 	return nil
+}
+
+func redisTopicCommentsCountKey(topicID uuid.UUID) string {
+	return fmt.Sprintf("forum:topic:%s:commentscount", topicID)
+}
+func (s *topicCommentServiceImpl) countByTopic(topicID uuid.UUID) (int64, error) {
+	ctx := context.Background()
+	key := redisTopicCommentsCountKey(topicID)
+
+	val, err := s.redis.Get(ctx, key).Result()
+	if err == nil {
+		var count int64
+		if jsonErr := json.Unmarshal([]byte(val), &count); jsonErr == nil {
+			return count, nil
+		}
+	}
+
+	// Fallback to DB
+	count, err := s.repo.count(topicID)
+	if err != nil {
+		return 0, err
+	}
+
+	// Cache result
+	s.redis.Set(ctx, key, count, time.Minute*5)
+	return count, nil
 }
 
 func (s *topicCommentServiceImpl) listByTopic(topicID uuid.UUID) ([]TopicComment, error) {
