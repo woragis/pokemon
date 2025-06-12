@@ -31,7 +31,6 @@ func newCommentLikeService(repo commentLikeRepository, redis *redis.Client) comm
 	return &commentLikeServiceImpl{repo: repo, redis: redis}
 }
 
-
 const commentLikeTTL = time.Hour * 1 // cache TTL
 
 func redisCommentLikeKey(commentID, userID uuid.UUID) string {

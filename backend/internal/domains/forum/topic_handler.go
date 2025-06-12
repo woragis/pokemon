@@ -12,7 +12,9 @@ import (
 
 type handler struct {
 	s topicService
-	i_category_s topicCategoryService
+	categoryService topicCategoryService
+	commentService topicCommentService
+	commentLikeService commentLikeService
 }
 
 func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
@@ -22,9 +24,17 @@ func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
 	categoryRepo := newTopicCategoryRepository(db)
 	categoryService := newTopicCategoryService(categoryRepo, redis)
 
+	commentRepo := newTopicCommentRepository(db)
+	commentService := newTopicCommentService(commentRepo, redis)
+
+	commentLikeRepo := newCommentLikeRepository(db)
+	commentLikeService := newCommentLikeService(commentLikeRepo, redis)
+
 	return &handler{
 		s: service,
-		i_category_s: categoryService,
+		categoryService: categoryService,
+		commentService: commentService,
+		commentLikeService: commentLikeService,
 	}
 }
 
