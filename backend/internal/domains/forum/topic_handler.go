@@ -12,17 +12,24 @@ import (
 
 type handler struct {
 	s topicService
+	i_category_s topicCategoryService
 }
 
 func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
 	repo := newTopicRepository(db)
 	service := newTopicService(repo, redis)
 
-	return &handler{s: service}
+	categoryRepo := newTopicCategoryRepository(db)
+	categoryService := newTopicCategoryService(categoryRepo, redis)
+
+	return &handler{
+		s: service,
+		i_category_s: categoryService,
+	}
 }
 
 // POST /topics
-func (h *handler) create(c *fiber.Ctx) error {
+func (h *handler) createTopic(c *fiber.Ctx) error {
 	userID, ok := c.Locals("userID").(uuid.UUID)
 	if !ok {
 		return fiber.NewError(fiber.StatusUnauthorized, "invalid user ID")
@@ -47,7 +54,7 @@ func (h *handler) create(c *fiber.Ctx) error {
 }
 
 // GET /topics/:id
-func (h *handler) getByID(c *fiber.Ctx) error {
+func (h *handler) getTopicByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	topic, err := h.s.getByID(id)
 	if err != nil {
@@ -60,7 +67,7 @@ func (h *handler) getByID(c *fiber.Ctx) error {
 }
 
 // PUT /topics/:id
-func (h *handler) update(c *fiber.Ctx) error {
+func (h *handler) updateTopic(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	var input Topic
@@ -82,7 +89,7 @@ func (h *handler) update(c *fiber.Ctx) error {
 }
 
 // DELETE /topics/:id
-func (h *handler) delete(c *fiber.Ctx) error {
+func (h *handler) deleteTopic(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if err := h.s.delete(id); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -91,7 +98,7 @@ func (h *handler) delete(c *fiber.Ctx) error {
 }
 
 // GET /topics
-func (h *handler) list(c *fiber.Ctx) error {
+func (h *handler) listTopic(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "10"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
 
@@ -104,7 +111,7 @@ func (h *handler) list(c *fiber.Ctx) error {
 }
 
 // GET /topics/user/user_id
-func (h *handler) listByUser(c *fiber.Ctx) error {
+func (h *handler) listTopicByUser(c *fiber.Ctx) error {
 	userIDParam := c.Params("user_id")
 
 	userID, err := uuid.Parse(userIDParam)
