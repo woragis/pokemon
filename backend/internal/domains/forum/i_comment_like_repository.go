@@ -16,6 +16,7 @@ type commentLikeRepository interface {
 	update(like *CommentLike) error
 	get(commentID, userID uuid.UUID) (*CommentLike, error)
 	delete(commentID, userID uuid.UUID) error
+	count(commentID uuid.UUID) (likes, dislikes int64, err error)
 }
 
 type commentLikeRepo struct {
@@ -59,4 +60,25 @@ func (r *commentLikeRepo) delete(commentID, userID uuid.UUID) error {
 	return r.db.
 		Where("comment_id = ? AND user_id = ?", commentID, userID).
 		Delete(&CommentLike{}).Error
+}
+
+func (r *commentLikeRepo) count(commentID uuid.UUID) (int64, int64, error) {
+	var likes int64
+	var dislikes int64
+
+	err := r.db.Model(&CommentLike{}).
+		Where("comment_id = ? AND like = TRUE", commentID).
+		Count(&likes).Error
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = r.db.Model(&CommentLike{}).
+		Where("comment_id = ? AND like = FALSE", commentID).
+		Count(&dislikes).Error
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return likes, dislikes, nil
 }
