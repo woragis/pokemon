@@ -7,14 +7,26 @@ import (
 )
 
 func (h *handler) RegisterRoutes(app fiber.Router) {
-	forumGroup := app.Group("/forum/topics")
-	forumGroup.Get("/", h.list)
-	forumGroup.Get("/user/:user_id", h.listByUser)
-	forumGroup.Get("/:id", h.getByID)
+	forumGroup := app.Group("/forum")
 
-	forumGroup.Use(middleware.AuthRequired())
+	topicGroup := forumGroup.Group("/topics")
+	topicGroup.Get("/", h.listTopic)
+	topicGroup.Get("/user/:user_id", h.listTopicByUser)
+	topicGroup.Get("/:id", h.getTopicByID)
 
-	forumGroup.Post("/", h.create)
-	forumGroup.Put("/:id", h.update)
-	forumGroup.Delete("/:id", h.delete)
+	topicGroup.Use(middleware.AuthRequired())
+
+	topicGroup.Post("/", h.createTopic)
+	topicGroup.Put("/:id", h.updateTopic)
+	topicGroup.Delete("/:id", h.deleteTopic)
+
+	categoryGroup := forumGroup.Group("/categories")
+	categoryGroup.Get("/", h.listCategories)
+	categoryGroup.Get("/:id", h.getCategoryByID)
+
+	categoryGroup.Use(middleware.AuthRequired())
+
+	categoryGroup.Post("/", h.createCategory)
+	categoryGroup.Put("/:id", h.updateCategory)
+	categoryGroup.Delete("/:id", h.deleteCategory)
 }
