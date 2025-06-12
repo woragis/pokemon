@@ -12,6 +12,9 @@ func (h *handler) createCategory(c *fiber.Ctx) error {
 	if err := c.BodyParser(&category); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
 	}
+	if err := category.Validate(); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
 	if err := h.i_category_s.create(&category); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -40,6 +43,9 @@ func (h *handler) updateCategory(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
 	}
 	category.ID = id
+	if err := category.Validate(); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
 	if err := h.i_category_s.update(&category); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
