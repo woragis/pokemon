@@ -29,4 +29,22 @@ func (h *handler) RegisterRoutes(app fiber.Router) {
 	categoryGroup.Post("/", h.createCategory)
 	categoryGroup.Put("/:id", h.updateCategory)
 	categoryGroup.Delete("/:id", h.deleteCategory)
+
+	// commentGroup := forumGroup.Group("/comments")
+	// commentGroup.Get("/", h)
+	// commentGroup.Get("/:id", h.getCategoryByID)
+
+	// commentGroup.Use(middleware.AuthRequired())
+
+	// commentGroup.Post("/", h.createCategory)
+	// commentGroup.Put("/:id", h.updateCategory)
+	// commentGroup.Delete("/:id", h.deleteCategory)
+
+	commentLikeGroup := forumGroup.Group("/comments/:comment_id/likes")
+	commentLikeGroup.Get("/", h.getLikes)                    // get all likes for comment (or user-specific if JWT)
+	commentLikeGroup.Get("/count", h.countLikes)             // total likes/dislikes
+	commentLikeGroup.Use(middleware.AuthRequired())
+	commentLikeGroup.Post("/", h.createLike)                 // body has {like: true/false}
+	commentLikeGroup.Put("/", h.updateLike)                  // same
+	commentLikeGroup.Delete("/", h.deleteLike)               // remove user's like
 }
