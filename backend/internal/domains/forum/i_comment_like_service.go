@@ -19,15 +19,16 @@ type commentLikeService interface {
 	update(like *CommentLike) error
 	get(commentID, userID uuid.UUID) (*CommentLike, error)
 	delete(commentID, userID uuid.UUID) error
+	count(commentID uuid.UUID) (likes, dislikes int64, err error)
 }
 
-type commentLikeServiceStruct struct {
+type commentLikeServiceImpl struct {
 	repo commentLikeRepository
 	redis *redis.Client
 }
 
 func newCommentLikeService(repo commentLikeRepository, redis *redis.Client) commentLikeService {
-	return &commentLikeServiceStruct{repo: repo, redis: redis}
+	return &commentLikeServiceImpl{repo: repo, redis: redis}
 }
 
 
@@ -41,7 +42,7 @@ func redisCommentLikeKey(commentID, userID uuid.UUID) string {
  * COMMENT LIKE SERVICE IMPLEMENTATION *
  ***************************************/
 
-func (s *commentLikeServiceStruct) create(like *CommentLike) error {
+func (s *commentLikeServiceImpl) create(like *CommentLike) error {
 	if err := s.repo.create(like); err != nil {
 		return err
 	}
@@ -52,7 +53,7 @@ func (s *commentLikeServiceStruct) create(like *CommentLike) error {
 	return nil
 }
 
-func (s *commentLikeServiceStruct) update(like *CommentLike) error {
+func (s *commentLikeServiceImpl) update(like *CommentLike) error {
 	if err := s.repo.update(like); err != nil {
 		return err
 	}
@@ -63,7 +64,7 @@ func (s *commentLikeServiceStruct) update(like *CommentLike) error {
 	return nil
 }
 
-func (s *commentLikeServiceStruct) get(commentID, userID uuid.UUID) (*CommentLike, error) {
+func (s *commentLikeServiceImpl) get(commentID, userID uuid.UUID) (*CommentLike, error) {
 	ctx := context.Background()
 	key := redisCommentLikeKey(commentID, userID)
 
@@ -88,7 +89,11 @@ func (s *commentLikeServiceStruct) get(commentID, userID uuid.UUID) (*CommentLik
 	return like, nil
 }
 
-func (s *commentLikeServiceStruct) delete(commentID, userID uuid.UUID) error {
+func (s *commentLikeServiceImpl) count(commentID uuid.UUID) (int64, int64, error) {
+	return s.repo.count(commentID)
+}
+
+func (s *commentLikeServiceImpl) delete(commentID, userID uuid.UUID) error {
 	if err := s.repo.delete(commentID, userID); err != nil {
 		return err
 	}
