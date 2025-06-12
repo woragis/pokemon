@@ -1,6 +1,11 @@
 package forum
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
@@ -25,19 +30,69 @@ func newCommentLikeService(repo commentLikeRepository, redis *redis.Client) comm
 	return &commentLikeServiceStruct{repo: repo, redis: redis}
 }
 
+
+const commentLikeTTL = time.Hour * 1 // cache TTL
+
+func redisCommentLikeKey(commentID, userID uuid.UUID) string {
+	return fmt.Sprintf("comment_like:%s:%s", commentID, userID)
+}
+
 /***************************************
  * COMMENT LIKE SERVICE IMPLEMENTATION *
  ***************************************/
 
 func (s *commentLikeServiceStruct) create(like *CommentLike) error {
-	return s.repo.create(like)
+	if err := s.repo.create(like); err != nil {
+		return err
+	}
+	// Cache it
+	key := redisCommentLikeKey(like.CommentID, like.UserID)
+	data, _ := json.Marshal(like)
+	s.redis.Set(context.Background(), key, data, commentLikeTTL)
+	return nil
 }
+
 func (s *commentLikeServiceStruct) update(like *CommentLike) error {
-	return s.repo.update(like)
+	if err := s.repo.update(like); err != nil {
+		return err
+	}
+	// Update cache
+	key := redisCommentLikeKey(like.CommentID, like.UserID)
+	data, _ := json.Marshal(like)
+	s.redis.Set(context.Background(), key, data, commentLikeTTL)
+	return nil
 }
+
 func (s *commentLikeServiceStruct) get(commentID, userID uuid.UUID) (*CommentLike, error) {
-	return s.repo.get(commentID, userID)
+	ctx := context.Background()
+	key := redisCommentLikeKey(commentID, userID)
+
+	// Try cache
+	cached, err := s.redis.Get(ctx, key).Result()
+	if err == nil {
+		var like CommentLike
+		if jsonErr := json.Unmarshal([]byte(cached), &like); jsonErr == nil {
+			return &like, nil
+		}
+	}
+
+	// Fallback to DB
+	like, err := s.repo.get(commentID, userID)
+	if err != nil || like == nil {
+		return like, err
+	}
+
+	// Store in Redis
+	data, _ := json.Marshal(like)
+	s.redis.Set(ctx, key, data, commentLikeTTL)
+	return like, nil
 }
+
 func (s *commentLikeServiceStruct) delete(commentID, userID uuid.UUID) error {
-	return s.repo.delete(commentID, userID)
+	if err := s.repo.delete(commentID, userID); err != nil {
+		return err
+	}
+	key := redisCommentLikeKey(commentID, userID)
+	s.redis.Del(context.Background(), key)
+	return nil
 }
