@@ -2,6 +2,7 @@ package forum
 
 import (
 	"net/http"
+	"pokemon/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -12,6 +13,11 @@ func (h *handler) createLike(c *fiber.Ctx) error {
 	if err := c.BodyParser(&like); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
 	}
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	like.ID = userID
 	if err := like.Validate(); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -26,6 +32,11 @@ func (h *handler) updateLike(c *fiber.Ctx) error {
 	if err := c.BodyParser(&like); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
 	}
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	like.ID = userID
 	if err := like.Validate(); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -77,9 +88,9 @@ func (h *handler) deleteLike(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid comment ID"})
 	}
-	userID, err := uuid.Parse(c.Params("user_id"))
+	userID, err := utils.GetUserIDFromLocals(c)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid user ID"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 	if err := h.commentLikeService.delete(commentID, userID); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
