@@ -1,7 +1,9 @@
 package forum
 
 import (
+	"errors"
 	"pokemon/internal/domains/user"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -76,4 +78,51 @@ type TopicCategory struct {
 	Name       string    `gorm:"uniqueIndex;not null" json:"name"`
 	Color      string    `gorm:"not null" json:"color"`
 	Description string   `json:"description"`
+}
+
+/***************
+ * VALIDATIONS *
+ ***************/
+
+func (l *TopicLike) Validate() error {
+	if l.TopicID == uuid.Nil {
+		return errors.New("topic_id is required")
+	}
+	if l.UserID == uuid.Nil {
+		return errors.New("user_id is required")
+	}
+	return nil
+}
+
+func (c *TopicComment) Validate() error {
+	if c.TopicID == uuid.Nil {
+		return errors.New("topic_id is required")
+	}
+	if c.UserID == uuid.Nil {
+		return errors.New("user_id is required")
+	}
+	if strings.TrimSpace(c.Content) == "" {
+		return errors.New("content is required")
+	}
+	return nil
+}
+
+func (l *CommentLike) Validate() error {
+	if l.CommentID == uuid.Nil {
+		return errors.New("comment_id is required")
+	}
+	if l.UserID == uuid.Nil {
+		return errors.New("user_id is required")
+	}
+	return nil
+}
+
+func (c *TopicCategory) Validate() error {
+	if strings.TrimSpace(c.Name) == "" {
+		return errors.New("name is required")
+	}
+	if strings.TrimSpace(c.Color) == "" {
+		return errors.New("color is required")
+	}
+	return nil
 }
