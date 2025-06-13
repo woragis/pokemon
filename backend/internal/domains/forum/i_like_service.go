@@ -16,9 +16,9 @@ import (
 
 type topicLikeService interface {
 	create(like *TopicLike) error
-	update(like *TopicLike) error
 	get(topicID, userID uuid.UUID) (*TopicLike, error)
 	delete(topicID, userID uuid.UUID) error
+	count(topicID uuid.UUID, likeValue bool) (int64, error)
 }
 
 type topicLikeServiceImpl struct {
@@ -38,27 +38,20 @@ func redisTopicLikeKey(topicID, userID uuid.UUID) string {
  * LIKE REPOSITORY IMPLEMENTATION *
  **********************************/
 
+func (s *topicLikeServiceImpl) count(topicID uuid.UUID, likeValue bool) (int64, error) {
+	return s.repo.count(topicID, likeValue)
+}
+
 func (s *topicLikeServiceImpl) create(like *TopicLike) error {
 	if err := s.repo.create(like); err != nil {
 		return err
 	}
 
-	// Set in Redis
+	// Cache in Redis
 	key := redisTopicLikeKey(like.TopicID, like.UserID)
 	data, _ := json.Marshal(like)
-	s.redis.Set(context.Background(), key, data, 10*time.Minute)
-	return nil
-}
+	_ = s.redis.Set(context.Background(), key, data, 10*time.Minute).Err()
 
-func (s *topicLikeServiceImpl) update(like *TopicLike) error {
-	if err := s.repo.update(like); err != nil {
-		return err
-	}
-
-	// Update in Redis
-	key := redisTopicLikeKey(like.TopicID, like.UserID)
-	data, _ := json.Marshal(like)
-	s.redis.Set(context.Background(), key, data, 10*time.Minute)
 	return nil
 }
 
@@ -66,9 +59,8 @@ func (s *topicLikeServiceImpl) get(topicID, userID uuid.UUID) (*TopicLike, error
 	ctx := context.Background()
 	key := redisTopicLikeKey(topicID, userID)
 
-	// Try cache
-	cached, err := s.redis.Get(ctx, key).Result()
-	if err == nil {
+	// Try Redis
+	if cached, err := s.redis.Get(ctx, key).Result(); err == nil {
 		var like TopicLike
 		if err := json.Unmarshal([]byte(cached), &like); err == nil {
 			return &like, nil
@@ -82,8 +74,9 @@ func (s *topicLikeServiceImpl) get(topicID, userID uuid.UUID) (*TopicLike, error
 	}
 
 	// Cache result
-	data, _ := json.Marshal(like)
-	s.redis.Set(ctx, key, data, 10*time.Minute)
+	if data, err := json.Marshal(like); err == nil {
+		_ = s.redis.Set(ctx, key, data, 10*time.Minute).Err()
+	}
 
 	return like, nil
 }
@@ -93,9 +86,9 @@ func (s *topicLikeServiceImpl) delete(topicID, userID uuid.UUID) error {
 		return err
 	}
 
-	// Delete from Redis
+	// Invalidate Redis
 	key := redisTopicLikeKey(topicID, userID)
-	s.redis.Del(context.Background(), key)
+	_ = s.redis.Del(context.Background(), key).Err()
 
 	return nil
 }
