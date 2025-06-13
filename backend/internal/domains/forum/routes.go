@@ -25,8 +25,8 @@ func (h *handler) RegisterRoutes(app fiber.Router) {
 	likeGroup.Post("/", h.createTopicLike)
 	likeGroup.Delete("/", h.deleteTopicLike)
 
+	forumGroup.Get("/topics/views", middleware.AuthRequired(), h.listViewsByUser)
 	viewGroup := forumGroup.Group("/topics/:topic_id/views")
-	viewGroup.Get("/", middleware.AuthRequired(), h.listViewsByUser)
 	viewGroup.Post("/", middleware.AuthOptional(), h.createView)
 
 	categoryGroup := forumGroup.Group("/categories")
