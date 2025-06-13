@@ -36,14 +36,14 @@ func (r *repository) create(topic *Topic) error {
 
 func (r *repository) getByID(id uuid.UUID) (*Topic, error) {
 	var topic Topic
-	err := r.db.Preload("Author").First(&topic, "id = ?", id).Error
+	err := r.db.Preload("User").First(&topic, "id = ?", id).Error
 	return &topic, err
 }
 
 func (r *repository) listByUser(userID uuid.UUID, limit, offset int) ([]Topic, error) {
 	var topics []Topic
 	err := r.db.
-		Preload("Author").
+		Preload("User").
 		Order("created_at DESC").
 		Where("user_id= ?", userID).
 		Limit(limit).
@@ -55,7 +55,7 @@ func (r *repository) listByUser(userID uuid.UUID, limit, offset int) ([]Topic, e
 func (r *repository) list(limit, offset int) ([]Topic, error) {
 	var topics []Topic
 	err := r.db.
-		Preload("Author").
+		Preload("User").
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).

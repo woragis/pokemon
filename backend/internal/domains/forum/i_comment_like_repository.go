@@ -12,9 +12,9 @@ import (
  *************************************/
 
 type commentLikeRepository interface {
-	create(like *CommentLike) error
-	update(like *CommentLike) error
-	get(commentID, userID uuid.UUID) (*CommentLike, error)
+	create(like *TopicCommentLike) error
+	update(like *TopicCommentLike) error
+	get(commentID, userID uuid.UUID) (*TopicCommentLike, error)
 	delete(commentID, userID uuid.UUID) error
 	count(commentID uuid.UUID) (likes, dislikes int64, err error)
 }
@@ -33,18 +33,18 @@ func newCommentLikeRepository(db *gorm.DB) commentLikeRepository {
  ******************************************/
 
 // Create a new CommentLike
-func (r *commentLikeRepo) create(like *CommentLike) error {
+func (r *commentLikeRepo) create(like *TopicCommentLike) error {
 	return r.db.Create(like).Error
 }
 
 // Update an existing CommentLike
-func (r *commentLikeRepo) update(like *CommentLike) error {
+func (r *commentLikeRepo) update(like *TopicCommentLike) error {
 	return r.db.Save(like).Error
 }
 
 // Get retrieves a CommentLike by commentID and userID
-func (r *commentLikeRepo) get(commentID, userID uuid.UUID) (*CommentLike, error) {
-	var like CommentLike
+func (r *commentLikeRepo) get(commentID, userID uuid.UUID) (*TopicCommentLike, error) {
+	var like TopicCommentLike
 	err := r.db.
 		Where("comment_id = ? AND user_id = ?", commentID, userID).
 		First(&like).Error
@@ -59,21 +59,21 @@ func (r *commentLikeRepo) get(commentID, userID uuid.UUID) (*CommentLike, error)
 func (r *commentLikeRepo) delete(commentID, userID uuid.UUID) error {
 	return r.db.
 		Where("comment_id = ? AND user_id = ?", commentID, userID).
-		Delete(&CommentLike{}).Error
+		Delete(&TopicCommentLike{}).Error
 }
 
 func (r *commentLikeRepo) count(commentID uuid.UUID) (int64, int64, error) {
 	var likes int64
 	var dislikes int64
 
-	err := r.db.Model(&CommentLike{}).
+	err := r.db.Model(&TopicCommentLike{}).
 		Where("comment_id = ? AND like = TRUE", commentID).
 		Count(&likes).Error
 	if err != nil {
 		return 0, 0, err
 	}
 
-	err = r.db.Model(&CommentLike{}).
+	err = r.db.Model(&TopicCommentLike{}).
 		Where("comment_id = ? AND like = FALSE", commentID).
 		Count(&dislikes).Error
 	if err != nil {

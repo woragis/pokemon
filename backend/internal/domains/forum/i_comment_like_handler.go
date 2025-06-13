@@ -9,7 +9,7 @@ import (
 )
 
 func (h *handler) createLike(c *fiber.Ctx) error {
-	var like CommentLike
+	var like TopicCommentLike
 	if err := c.BodyParser(&like); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
 	}
@@ -28,7 +28,7 @@ func (h *handler) createLike(c *fiber.Ctx) error {
 }
 
 func (h *handler) updateLike(c *fiber.Ctx) error {
-	var like CommentLike
+	var like TopicCommentLike
 	if err := c.BodyParser(&like); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "invalid payload"})
 	}

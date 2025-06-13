@@ -15,7 +15,7 @@ import (
  ****************/
 
 type TopicView struct {
-	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:generate_uuid_v4()"`
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	TopicID   uuid.UUID `json:"topic_id" gorm:"type:uuid;index;not null"`
 	UserID    uuid.UUID `json:"user_id" gorm:"type:uuid;index"`
 
@@ -28,7 +28,7 @@ type TopicView struct {
 }
 
 type TopicLike struct {
-	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:generate_uuid_v4()"`
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	TopicID   uuid.UUID `json:"topic_id" gorm:"type:uuid;not null;index:idx_topic_like,unique"`
 	UserID    uuid.UUID `json:"user_id" gorm:"type:uuid;not null;index:idx_topic_like,unique"`
 
@@ -41,7 +41,7 @@ type TopicLike struct {
 }
 
 type TopicComment struct {
-	ID           uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey;default:generate_uuid_v4()"`
+	ID           uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	TopicID      uuid.UUID      `json:"topic_id" gorm:"type:uuid;not null;index:idx_topic_like,unique"`
 	UserID       uuid.UUID      `json:"user_id" gorm:"type:uuid;not null;index:idx_topic_like,unique"`
 	ParentID     uuid.UUID      `json:"parent_id,omitempty" gorm:"type:uuid;index"`
@@ -60,8 +60,8 @@ type TopicComment struct {
     DeletedAt    gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }
 
-type CommentLike struct {
-	ID        uuid.UUID    `json:"id" gorm:"type:uuid;primaryKey;default:generate_uuid_v4()"`
+type TopicCommentLike struct {
+	ID        uuid.UUID    `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	CommentID uuid.UUID    `json:"comment_id" gorm:"type:uuid;not null;index:idx_topic_comment_like,unique"`
 	UserID    uuid.UUID    `json:"user_id" gorm:"type:uuid;not null;index:idx_topic_comment_like,unique"`
 
@@ -107,7 +107,7 @@ func (c *TopicComment) Validate() error {
 	return nil
 }
 
-func (l *CommentLike) Validate() error {
+func (l *TopicCommentLike) Validate() error {
 	if l.CommentID == uuid.Nil {
 		return errors.New("comment_id is required")
 	}

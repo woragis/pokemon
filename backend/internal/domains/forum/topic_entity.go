@@ -11,7 +11,7 @@ import (
 )
 
 type Topic struct {
-	ID           uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey;default:generate_uuid_v4()"`
+	ID           uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID       uuid.UUID      `json:"user_id" gorm:"type:uuid;not null;index"`
 	Title        string         `json:"title" gorm:"not null"`
 	Content      string         `json:"content" gorm:"not null"`

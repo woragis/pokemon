@@ -15,9 +15,9 @@ import (
  **********************************/
 
 type commentLikeService interface {
-	create(like *CommentLike) error
-	update(like *CommentLike) error
-	get(commentID, userID uuid.UUID) (*CommentLike, error)
+	create(like *TopicCommentLike) error
+	update(like *TopicCommentLike) error
+	get(commentID, userID uuid.UUID) (*TopicCommentLike, error)
 	delete(commentID, userID uuid.UUID) error
 	count(commentID uuid.UUID) (likes, dislikes int64, err error)
 }
@@ -41,7 +41,7 @@ func redisCommentLikeKey(commentID, userID uuid.UUID) string {
  * COMMENT LIKE SERVICE IMPLEMENTATION *
  ***************************************/
 
-func (s *commentLikeServiceImpl) create(like *CommentLike) error {
+func (s *commentLikeServiceImpl) create(like *TopicCommentLike) error {
 	if err := s.repo.create(like); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (s *commentLikeServiceImpl) create(like *CommentLike) error {
 	return nil
 }
 
-func (s *commentLikeServiceImpl) update(like *CommentLike) error {
+func (s *commentLikeServiceImpl) update(like *TopicCommentLike) error {
 	if err := s.repo.update(like); err != nil {
 		return err
 	}
@@ -63,14 +63,14 @@ func (s *commentLikeServiceImpl) update(like *CommentLike) error {
 	return nil
 }
 
-func (s *commentLikeServiceImpl) get(commentID, userID uuid.UUID) (*CommentLike, error) {
+func (s *commentLikeServiceImpl) get(commentID, userID uuid.UUID) (*TopicCommentLike, error) {
 	ctx := context.Background()
 	key := redisCommentLikeKey(commentID, userID)
 
 	// Try cache
 	cached, err := s.redis.Get(ctx, key).Result()
 	if err == nil {
-		var like CommentLike
+		var like TopicCommentLike
 		if jsonErr := json.Unmarshal([]byte(cached), &like); jsonErr == nil {
 			return &like, nil
 		}
