@@ -16,6 +16,7 @@ type handler struct {
 	commentService topicCommentService
 	commentLikeService commentLikeService
 	viewService topicViewService
+	likeService topicLikeService
 }
 
 func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
@@ -34,12 +35,16 @@ func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
 	viewRepo := newTopicViewRepository(db)
 	viewService := newTopicViewService(viewRepo, redis)
 
+	likeRepo := newTopicLikeRepository(db)
+	likeService := newTopicLikeService(likeRepo, redis)
+
 	return &handler{
 		s: service,
 		categoryService: categoryService,
 		commentService: commentService,
 		commentLikeService: commentLikeService,
 		viewService: viewService,
+		likeService: likeService,
 	}
 }
 
