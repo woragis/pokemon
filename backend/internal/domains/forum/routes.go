@@ -18,11 +18,12 @@ func (h *handler) RegisterRoutes(app fiber.Router) {
 	topicGroup.Put("/:id", h.updateTopic)
 	topicGroup.Delete("/:id", h.deleteTopic)
 
-	likeGroup := forumGroup.Group("/topics/:topic_id")
-	// likeGroup.Get("/count", h.countTopicLikes)
+	likeGroup := forumGroup.Group("/topics/:topic_id/likes")
+	likeGroup.Get("/count", h.countTopicLikes)
 	likeGroup.Use(middleware.AuthRequired())
-	// likeGroup.Post("/", h.createTopicLike)
-	// likeGroup.Delete("/", h.deleteTopicLike)
+	likeGroup.Get("/", h.getTopicLike)
+	likeGroup.Post("/", h.createTopicLike)
+	likeGroup.Delete("/", h.deleteTopicLike)
 
 	viewGroup := forumGroup.Group("/topics/:topic_id/views")
 	viewGroup.Get("/", middleware.AuthRequired(), h.listViewsByUser)
