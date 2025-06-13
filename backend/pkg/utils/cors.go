@@ -13,6 +13,9 @@ func SetupCors(config *config.Config) fiber.Handler {
 		AllowOrigins:     strings.Join(config.CORSAllowedOrigins, ","),
 		AllowMethods:     strings.Join(config.CORSAllowedMethods, ","),
 		AllowHeaders:     strings.Join(config.CORSAllowedHeaders, ","),
+		// AllowOrigins:     "*",
+		// AllowMethods:     "*",
+		// AllowHeaders:     "*",
 		AllowCredentials: true,
 		MaxAge:           3600,
 	})
