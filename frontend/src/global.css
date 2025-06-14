@@ -1,0 +1,51 @@
+/* Base Theme (e.g. classic) */
+:root {
+	--color-primary: #cc0000;
+	--color-secondary: #ffcc00;
+	--color-accent: #3fa34d;
+	--color-neutral: #444444;
+	--color-base: #f8f8f8;
+	--color-info: #003366;
+	--color-success: #3fa34d;
+	--color-warning: #ffcc00;
+	--color-error: #cc0000;
+}
+
+/* Modern Theme */
+.theme-modern {
+	--color-primary: #0075ff;
+	--color-secondary: #a3a8b0;
+	--color-accent: #ff4d4d;
+	--color-neutral: #0a0f2f;
+	--color-base: #e6f7ff;
+	--color-info: #0075ff;
+	--color-success: #3fa34d;
+	--color-warning: #ffb020;
+	--color-error: #ff4d4d;
+}
+
+/* Elemental Theme */
+.theme-elemental {
+	--color-primary: #78c850;
+	--color-secondary: #6890f0;
+	--color-accent: #f08030;
+	--color-neutral: #a8a878;
+	--color-base: #ffffff;
+	--color-info: #a040a0;
+	--color-success: #78c850;
+	--color-warning: #f08030;
+	--color-error: #a040a0;
+}
+
+/* Clean Theme */
+.theme-clean {
+	--color-primary: #3e4a59;
+	--color-secondary: #d6efff;
+	--color-accent: #ff6b6b;
+	--color-neutral: #ffffff;
+	--color-base: #ffffff;
+	--color-info: #3e4a59;
+	--color-success: #a8e6cf;
+	--color-warning: #ffcc00;
+	--color-error: #ff6b6b;
+}
