@@ -10,6 +10,7 @@ import (
 	"pokemon/internal/domains/blog"
 	favoritepokemon "pokemon/internal/domains/favorite-pokemon"
 	"pokemon/internal/domains/forum"
+	"pokemon/internal/domains/shout"
 	"pokemon/internal/domains/team"
 	"pokemon/internal/domains/user"
 	"pokemon/internal/middleware"
@@ -54,6 +55,7 @@ func main() {
     user.NewHandler(db, redis).RegisterRoutes(api)
     team.NewHandler(db, redis).RegisterRoutes(api)
     blog.NewHandler(db, redis).RegisterRoutes(api)
+    shout.NewHandler(db, redis).RegisterRoutes(api)
     forum.NewHandler(db, redis).RegisterRoutes(api)
     favoritepokemon.NewHandler(db, redis).RegisterRoutes(api)
     
