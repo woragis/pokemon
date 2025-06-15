@@ -2,11 +2,14 @@
 	import ForumTopics from '$lib/components/forum/ForumTopics.svelte';
 	import ForumSidebar from '$lib/components/forum/ForumSidebar.svelte';
 	import ForumControls from '$lib/components/forum/ForumControls.svelte';
-	import { PlusCircle } from 'lucide-svelte';
+	import { PlusCircle, Settings } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 
 	function handleNewTopic() {
 		goto('/forum/new');
+	}
+	function handleCategories() {
+		goto('/forum/categories');
 	}
 </script>
 
@@ -25,6 +28,13 @@
 			>
 				<PlusCircle size={18} class="mr-2" />
 				New Topic
+			</button>
+			<button
+				class="flex items-center rounded-lg bg-white px-6 py-3 font-semibold text-green-700 hover:bg-green-50"
+				on:click={handleCategories}
+			>
+				<Settings size={18} class="mr-2" />
+				Manage Categories
 			</button>
 		</div>
 	</div>
