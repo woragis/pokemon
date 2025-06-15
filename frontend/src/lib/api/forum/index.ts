@@ -1,7 +1,3 @@
-import { API_URL } from '..';
-
-export const FORUM_URL = `${API_URL}/forum`;
-
 export {
 	fetchForumCategories,
 	fetchForumCategoryById,
