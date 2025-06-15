@@ -1,5 +1,5 @@
 import { AUTH_URL, type AuthResponse } from '.';
-import { getHeaders, setCookie } from '..';
+import { API_URL, getHeaders, setCookie } from '..';
 
 interface LoginProps {
 	email: string;
@@ -13,7 +13,7 @@ interface UsernameLoginProps {
 
 export async function login({ email, password }: LoginProps) {
 	try {
-		const res = await fetch(`${AUTH_URL}/login`, {
+		const res = await fetch(`${API_URL}/users/login`, {
 			method: 'POST',
 			headers: getHeaders(),
 			body: JSON.stringify({ email, password })
