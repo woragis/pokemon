@@ -19,6 +19,9 @@ type Shout struct {
 
 	ReshoutOfID  *uuid.UUID     `gorm:"type:uuid;index" json:"reshout_of_id,omitempty"`
 	ReshoutOf    *Shout         `gorm:"foreignKey:ReshoutOfID" json:"reshout_of,omitempty"`
+	QuoteCommentID *uuid.UUID     `gorm:"type:uuid" json:"quote_comment_id,omitempty"`
+	QuoteComment   *ShoutComment `gorm:"foreignKey:QuoteCommentID" json:"quote_comment,omitempty"`
+
 	QuoteContent *string        `gorm:"type:varchar(280)" json:"quote_content,omitempty"`
 
 	Likes        []ShoutLike    `gorm:"constraint:OnDelete:CASCADE" json:"likes"`
@@ -40,6 +43,9 @@ type ShoutComment struct {
 	ParentCommentID *uuid.UUID      `gorm:"type:uuid;index" json:"parent_comment_id,omitempty"`
 	ParentComment   *ShoutComment   `gorm:"foreignKey:ParentCommentID" json:"-"`
 	Replies         []ShoutComment  `gorm:"foreignKey:ParentCommentID" json:"replies,omitempty"`
+
+	Likes     []ShoutCommentLike `gorm:"constraint:OnDelete:CASCADE" json:"likes"`
+	LikeCount int                `gorm:"default:0" json:"like_count"`
 }
 
 type ShoutLike struct {
@@ -47,4 +53,11 @@ type ShoutLike struct {
 	UserID    uuid.UUID `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_shout_like" json:"user_id"`
 	ShoutID   uuid.UUID `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_shout_like" json:"shout_id"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type ShoutCommentLike struct {
+	ID        uuid.UUID    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	UserID    uuid.UUID    `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_comment_like" json:"user_id"`
+	CommentID uuid.UUID    `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_comment_like" json:"comment_id"`
+	CreatedAt time.Time    `json:"created_at"`
 }
