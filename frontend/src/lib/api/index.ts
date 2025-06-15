@@ -1,5 +1,5 @@
 export const BASE_URL = 'http://localhost:3000';
-export const API_URL = `${BASE_URL}/api`;
+export const API_URL = `${BASE_URL}/api/v1`;
 
 export function getHeaders() {
 	const token = getCookie('token');
