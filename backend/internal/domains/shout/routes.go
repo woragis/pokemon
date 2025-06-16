@@ -15,7 +15,7 @@ func (h *handler) RegisterRoutes(app fiber.Router) {
 
 	shouts.Use(middleware.AuthRequired())
 	shouts.Post("/", h.createShout)
-	shouts.Post("/:id", h.retweetShout)
+	shouts.Post("/:id/reshout", h.retweetShout)
 	shouts.Put("/:id", h.updateShout)
 	shouts.Delete("/:id", h.deleteShout)
 }
