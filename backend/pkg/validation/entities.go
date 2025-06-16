@@ -26,3 +26,43 @@ func StringMaxLength(str string, max int, field string) error {
 	}
 	return nil
 }
+
+func Email() error {
+	return nil
+}
+
+func Password() error {
+	return nil
+}
+
+func Username() error {
+	return nil
+}
+
+func DateOfBirth() error {
+	return nil
+}
+
+func CreditCard() error {
+	return nil
+}
+
+func Phone() error {
+	return nil
+}
+
+func Timezone() error {
+	return nil
+}
+
+func FileExtension() error {
+	return nil
+}
+
+func Urls() error {
+	return nil
+}
+
+func Address() error {
+	return nil
+}
