@@ -46,29 +46,29 @@ func (r *snapRepo) delete(id uuid.UUID) error {
 
 func (r *snapRepo) getById(id uuid.UUID) (*Snap, error) {
 	var snap Snap
-	err := r.db.First(&snap).Where("id = ?", id).Error
+	err := r.db.Where("id = ?", id).First(&snap).Error // 🔧 fix: chain Where before First
 	return &snap, err
 }
 
 func (r *snapRepo) list(limit, offset int) ([]Snap, error) {
 	var snaps []Snap
 	err := r.db.
-		Find(&snaps).
+		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
-		Order("created_at DESC").
-		Error
+		Find(&snaps).
+		Error // 🔧 fix: Order, Limit, Offset must come before Find
 	return snaps, err
 }
 
 func (r *snapRepo) listByUser(userID uuid.UUID, limit, offset int) ([]Snap, error) {
 	var snaps []Snap
 	err := r.db.
-		Find(&snaps).
 		Where("user_id = ?", userID).
+		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
-		Order("created_at DESC").
+		Find(&snaps).
 		Error
 	return snaps, err
 }
@@ -76,7 +76,7 @@ func (r *snapRepo) listByUser(userID uuid.UUID, limit, offset int) ([]Snap, erro
 func (r *snapRepo) countByUser(userID uuid.UUID) (int64, error) {
 	var count int64
 	err := r.db.
-		Find(&Snap{}).
+		Model(&Snap{}). // 🔧 fix: use Model, not Find
 		Where("user_id = ?", userID).
 		Count(&count).
 		Error
