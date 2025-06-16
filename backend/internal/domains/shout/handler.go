@@ -12,12 +12,16 @@ import (
 // shoutHandler struct with shoutService injected
 type handler struct {
 	s shoutService
+	is interactionService
 }
 
 func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
 	repo := newShoutRepo(db)      // assumes your repo constructor
 	service := newService(repo, redis)
-	return &handler{s: service}
+
+	iRepo := newInteractionRepo(db)
+	iService := newInteractionService(iRepo, redis)
+	return &handler{s: service, is: iService}
 }
 
 // POST /shouts
