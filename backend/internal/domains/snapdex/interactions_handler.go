@@ -210,3 +210,103 @@ func (h *snapLikeHandler) isLikedByUser(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"liked": isLiked})
 }
+
+type snapCommentLikeHandler struct {
+	service snapCommentLikeService
+}
+
+func newSnapCommentLikeHandler(service snapCommentLikeService) *snapCommentLikeHandler {
+	return &snapCommentLikeHandler{service}
+}
+
+func (h *snapCommentLikeHandler) like(c *fiber.Ctx) error {
+	commentID, err := uuid.Parse(c.Params("comment_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	like := &SnapCommentLike{
+		CommentID: commentID,
+		UserID:    userID,
+	}
+
+	if err := like.Validate(); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	if err := h.service.like(like); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusCreated)
+}
+
+func (h *snapCommentLikeHandler) unlike(c *fiber.Ctx) error {
+	commentID, err := uuid.Parse(c.Params("comment_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	if err := h.service.unlike(commentID, userID); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func (h *snapCommentLikeHandler) listByComment(c *fiber.Ctx) error {
+	commentID, err := uuid.Parse(c.Params("comment_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
+	}
+
+	likes, err := h.service.listByComment(commentID)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(likes)
+}
+
+func (h *snapCommentLikeHandler) listUserLikes(c *fiber.Ctx) error {
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	likes, err := h.service.listUserLikes(userID)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(likes)
+}
+
+func (h *snapCommentLikeHandler) isLikedByUser(c *fiber.Ctx) error {
+	commentID, err := uuid.Parse(c.Params("comment_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	liked, err := h.service.isLikedByUser(commentID, userID)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(fiber.Map{"liked": liked})
+}
