@@ -11,13 +11,31 @@ import (
 
 type handler struct {
 	s SnapService
+	iLikeS snapLikeService
+	iCommentS snapCommentService
+	iCommentLikeS snapCommentLikeService
 }
 
 func NewHandler(db *gorm.DB, redis *redis.Client) handler {
 	repo := newRepo(db)
 	serv := newSnapService(repo, redis)
 
-	return handler{s: serv}
+	// iRepo := newIRepo(db)
+	likeRepo := newSnapLikeRepo(db)
+	likeServ := newSnapLikeService(likeRepo, redis)
+
+	commentRepo := newSnapCommentRepo(db)
+	commentServ := newSnapCommentService(commentRepo, redis)
+
+	likeCommentRepo := newSnapCommentLikeRepo(db)
+	likeCommentServ := newSnapCommentLikeService(likeCommentRepo, redis)
+
+	return handler{
+		s: serv,
+		iLikeS: likeServ,
+		iCommentS: commentServ,
+		iCommentLikeS: likeCommentServ,
+	}
 }
 
 // Private: Create Snap
