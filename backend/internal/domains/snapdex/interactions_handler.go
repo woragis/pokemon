@@ -7,15 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type snapCommentHandler struct {
-	iCommentS snapCommentService
-}
-
-func newSnapCommentHandler(service snapCommentService) *snapCommentHandler {
-	return &snapCommentHandler{iCommentS: service}
-}
-
-func (h *snapCommentHandler) create(c *fiber.Ctx) error {
+func (h *handler) createComment(c *fiber.Ctx) error {
 	var comment SnapComment
 	if err := c.BodyParser(&comment); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid body")
@@ -38,7 +30,7 @@ func (h *snapCommentHandler) create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(comment)
 }
 
-func (h *snapCommentHandler) listByUser(c *fiber.Ctx) error {
+func (h *handler) listCommentsByUser(c *fiber.Ctx) error {
 	userID, err := utils.GetUserIDFromLocals(c)
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
@@ -53,7 +45,7 @@ func (h *snapCommentHandler) listByUser(c *fiber.Ctx) error {
 	return c.JSON(comments)
 }
 
-func (h *snapCommentHandler) countByUser(c *fiber.Ctx) error {
+func (h *handler) countCommentsByUser(c *fiber.Ctx) error {
 	userID, err := utils.GetUserIDFromLocals(c)
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
@@ -67,7 +59,7 @@ func (h *snapCommentHandler) countByUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"count": count})
 }
 
-func (h *snapCommentHandler) updateStatus(c *fiber.Ctx) error {
+func (h *handler) updateCommentStatus(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
@@ -85,7 +77,7 @@ func (h *snapCommentHandler) updateStatus(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-func (h *snapCommentHandler) delete(c *fiber.Ctx) error {
+func (h *handler) deleteComment(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
@@ -98,7 +90,7 @@ func (h *snapCommentHandler) delete(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-func (h *snapCommentHandler) exists(c *fiber.Ctx) error {
+func (h *handler) commentExists(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
@@ -112,15 +104,7 @@ func (h *snapCommentHandler) exists(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"exists": exists})
 }
 
-type snapLikeHandler struct {
-	iLikeS snapLikeService
-}
-
-func newSnapLikeHandler(service snapLikeService) *snapLikeHandler {
-	return &snapLikeHandler{service}
-}
-
-func (h *snapLikeHandler) like(c *fiber.Ctx) error {
+func (h *handler) likeSnap(c *fiber.Ctx) error {
 	snapID, err := uuid.Parse(c.Params("snap_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
@@ -147,7 +131,7 @@ func (h *snapLikeHandler) like(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusCreated)
 }
 
-func (h *snapLikeHandler) unlike(c *fiber.Ctx) error {
+func (h *handler) unlikeSnap(c *fiber.Ctx) error {
 	snapID, err := uuid.Parse(c.Params("snap_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
@@ -165,7 +149,7 @@ func (h *snapLikeHandler) unlike(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-func (h *snapLikeHandler) deleteAllBySnap(c *fiber.Ctx) error {
+func (h *handler) deleteAllLikesBySnap(c *fiber.Ctx) error {
 	snapID, err := uuid.Parse(c.Params("snap_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
@@ -178,7 +162,7 @@ func (h *snapLikeHandler) deleteAllBySnap(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-func (h *snapLikeHandler) listUserLikes(c *fiber.Ctx) error {
+func (h *handler) listUserLikes(c *fiber.Ctx) error {
 	userID, err := utils.GetUserIDFromLocals(c)
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
@@ -192,7 +176,7 @@ func (h *snapLikeHandler) listUserLikes(c *fiber.Ctx) error {
 	return c.JSON(likes)
 }
 
-func (h *snapLikeHandler) isLikedByUser(c *fiber.Ctx) error {
+func (h *handler) isLikedByUser(c *fiber.Ctx) error {
 	snapID, err := uuid.Parse(c.Params("snap_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
@@ -211,15 +195,7 @@ func (h *snapLikeHandler) isLikedByUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"liked": isLiked})
 }
 
-type snapCommentLikeHandler struct {
-	iCommentLikeS snapCommentLikeService
-}
-
-func newSnapCommentLikeHandler(service snapCommentLikeService) *snapCommentLikeHandler {
-	return &snapCommentLikeHandler{service}
-}
-
-func (h *snapCommentLikeHandler) like(c *fiber.Ctx) error {
+func (h *handler) likeComment(c *fiber.Ctx) error {
 	commentID, err := uuid.Parse(c.Params("comment_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
@@ -246,7 +222,7 @@ func (h *snapCommentLikeHandler) like(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusCreated)
 }
 
-func (h *snapCommentLikeHandler) unlike(c *fiber.Ctx) error {
+func (h *handler) unlikeComment(c *fiber.Ctx) error {
 	commentID, err := uuid.Parse(c.Params("comment_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
@@ -264,7 +240,7 @@ func (h *snapCommentLikeHandler) unlike(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-func (h *snapCommentLikeHandler) listByComment(c *fiber.Ctx) error {
+func (h *handler) listLikesByComment(c *fiber.Ctx) error {
 	commentID, err := uuid.Parse(c.Params("comment_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
@@ -278,7 +254,7 @@ func (h *snapCommentLikeHandler) listByComment(c *fiber.Ctx) error {
 	return c.JSON(likes)
 }
 
-func (h *snapCommentLikeHandler) listUserLikes(c *fiber.Ctx) error {
+func (h *handler) listCommentsUserLikes(c *fiber.Ctx) error {
 	userID, err := utils.GetUserIDFromLocals(c)
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
@@ -292,7 +268,7 @@ func (h *snapCommentLikeHandler) listUserLikes(c *fiber.Ctx) error {
 	return c.JSON(likes)
 }
 
-func (h *snapCommentLikeHandler) isLikedByUser(c *fiber.Ctx) error {
+func (h *handler) isCommentLikedByUser(c *fiber.Ctx) error {
 	commentID, err := uuid.Parse(c.Params("comment_id"))
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
