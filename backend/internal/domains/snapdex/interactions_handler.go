@@ -111,3 +111,102 @@ func (h *snapCommentHandler) exists(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"exists": exists})
 }
+
+type snapLikeHandler struct {
+	service snapLikeService
+}
+
+func newSnapLikeHandler(service snapLikeService) *snapLikeHandler {
+	return &snapLikeHandler{service}
+}
+
+func (h *snapLikeHandler) like(c *fiber.Ctx) error {
+	snapID, err := uuid.Parse(c.Params("snap_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	like := &SnapLike{
+		SnapID: snapID,
+		UserID: userID,
+	}
+
+	if err := like.Validate(); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	if err := h.service.like(like); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusCreated)
+}
+
+func (h *snapLikeHandler) unlike(c *fiber.Ctx) error {
+	snapID, err := uuid.Parse(c.Params("snap_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	if err := h.service.unlike(snapID, userID); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func (h *snapLikeHandler) deleteAllBySnap(c *fiber.Ctx) error {
+	snapID, err := uuid.Parse(c.Params("snap_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
+	}
+
+	if err := h.service.deleteAllBySnap(snapID); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func (h *snapLikeHandler) listUserLikes(c *fiber.Ctx) error {
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	likes, err := h.service.listUserLikes(userID)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(likes)
+}
+
+func (h *snapLikeHandler) isLikedByUser(c *fiber.Ctx) error {
+	snapID, err := uuid.Parse(c.Params("snap_id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
+	}
+
+	userID, err := utils.GetUserIDFromLocals(c)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	isLiked, err := h.service.isLikedByUser(snapID, userID)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(fiber.Map{"liked": isLiked})
+}
