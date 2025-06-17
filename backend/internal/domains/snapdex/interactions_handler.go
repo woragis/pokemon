@@ -8,11 +8,11 @@ import (
 )
 
 type snapCommentHandler struct {
-	service snapCommentService
+	iCommentS snapCommentService
 }
 
 func newSnapCommentHandler(service snapCommentService) *snapCommentHandler {
-	return &snapCommentHandler{service: service}
+	return &snapCommentHandler{iCommentS: service}
 }
 
 func (h *snapCommentHandler) create(c *fiber.Ctx) error {
@@ -31,7 +31,7 @@ func (h *snapCommentHandler) create(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.create(&comment); err != nil {
+	if err := h.iCommentS.create(&comment); err != nil {
 		return err
 	}
 
@@ -45,7 +45,7 @@ func (h *snapCommentHandler) listByUser(c *fiber.Ctx) error {
 	}
 
 	limit, offset := utils.ParsePagination(c)
-	comments, err := h.service.listByUser(userID, limit, offset)
+	comments, err := h.iCommentS.listByUser(userID, limit, offset)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (h *snapCommentHandler) countByUser(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
-	count, err := h.service.countByUser(userID)
+	count, err := h.iCommentS.countByUser(userID)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (h *snapCommentHandler) updateStatus(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid status")
 	}
 
-	if err := h.service.updateStatus(id, status); err != nil {
+	if err := h.iCommentS.updateStatus(id, status); err != nil {
 		return err
 	}
 
@@ -91,7 +91,7 @@ func (h *snapCommentHandler) delete(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
 	}
 
-	if err := h.service.delete(id); err != nil {
+	if err := h.iCommentS.delete(id); err != nil {
 		return err
 	}
 
@@ -104,7 +104,7 @@ func (h *snapCommentHandler) exists(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
 	}
 
-	exists, err := h.service.exists(id)
+	exists, err := h.iCommentS.exists(id)
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func (h *snapCommentHandler) exists(c *fiber.Ctx) error {
 }
 
 type snapLikeHandler struct {
-	service snapLikeService
+	iLikeS snapLikeService
 }
 
 func newSnapLikeHandler(service snapLikeService) *snapLikeHandler {
@@ -140,7 +140,7 @@ func (h *snapLikeHandler) like(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.like(like); err != nil {
+	if err := h.iLikeS.like(like); err != nil {
 		return err
 	}
 
@@ -158,7 +158,7 @@ func (h *snapLikeHandler) unlike(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
-	if err := h.service.unlike(snapID, userID); err != nil {
+	if err := h.iLikeS.unlike(snapID, userID); err != nil {
 		return err
 	}
 
@@ -171,7 +171,7 @@ func (h *snapLikeHandler) deleteAllBySnap(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid snap_id")
 	}
 
-	if err := h.service.deleteAllBySnap(snapID); err != nil {
+	if err := h.iLikeS.deleteAllBySnap(snapID); err != nil {
 		return err
 	}
 
@@ -184,7 +184,7 @@ func (h *snapLikeHandler) listUserLikes(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
-	likes, err := h.service.listUserLikes(userID)
+	likes, err := h.iLikeS.listUserLikes(userID)
 	if err != nil {
 		return err
 	}
@@ -203,7 +203,7 @@ func (h *snapLikeHandler) isLikedByUser(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
-	isLiked, err := h.service.isLikedByUser(snapID, userID)
+	isLiked, err := h.iLikeS.isLikedByUser(snapID, userID)
 	if err != nil {
 		return err
 	}
@@ -212,7 +212,7 @@ func (h *snapLikeHandler) isLikedByUser(c *fiber.Ctx) error {
 }
 
 type snapCommentLikeHandler struct {
-	service snapCommentLikeService
+	iCommentLikeS snapCommentLikeService
 }
 
 func newSnapCommentLikeHandler(service snapCommentLikeService) *snapCommentLikeHandler {
@@ -239,7 +239,7 @@ func (h *snapCommentLikeHandler) like(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.like(like); err != nil {
+	if err := h.iCommentLikeS.like(like); err != nil {
 		return err
 	}
 
@@ -257,7 +257,7 @@ func (h *snapCommentLikeHandler) unlike(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
-	if err := h.service.unlike(commentID, userID); err != nil {
+	if err := h.iCommentLikeS.unlike(commentID, userID); err != nil {
 		return err
 	}
 
@@ -270,7 +270,7 @@ func (h *snapCommentLikeHandler) listByComment(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid comment_id")
 	}
 
-	likes, err := h.service.listByComment(commentID)
+	likes, err := h.iCommentLikeS.listByComment(commentID)
 	if err != nil {
 		return err
 	}
@@ -284,7 +284,7 @@ func (h *snapCommentLikeHandler) listUserLikes(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
-	likes, err := h.service.listUserLikes(userID)
+	likes, err := h.iCommentLikeS.listUserLikes(userID)
 	if err != nil {
 		return err
 	}
@@ -303,7 +303,7 @@ func (h *snapCommentLikeHandler) isLikedByUser(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
 
-	liked, err := h.service.isLikedByUser(commentID, userID)
+	liked, err := h.iCommentLikeS.isLikedByUser(commentID, userID)
 	if err != nil {
 		return err
 	}
