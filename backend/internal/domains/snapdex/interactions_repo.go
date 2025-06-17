@@ -15,7 +15,7 @@ type snapCommentRepository interface {
 	listByUser(userID uuid.UUID, limit, offset int) ([]SnapComment, error)
 	countByUser(userID uuid.UUID) (int64, error)
 	updateStatus(id uuid.UUID, status string) error
-	softDelete(id uuid.UUID) error
+	delete(id uuid.UUID) error
 	existsByID(id uuid.UUID) (bool, error)
 }
 
@@ -97,7 +97,7 @@ func (r *snapCommentRepo) updateStatus(id uuid.UUID, status string) error {
 	return r.db.Model(&SnapComment{}).Where("id = ?", id).Update("status", status).Error
 }
 
-func (r *snapCommentRepo) softDelete(id uuid.UUID) error {
+func (r *snapCommentRepo) delete(id uuid.UUID) error {
 	return r.db.Delete(&SnapComment{}, "id = ?", id).Error
 }
 
