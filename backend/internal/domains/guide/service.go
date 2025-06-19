@@ -1,4 +1,4 @@
-package gamguide
+package guide
 
 import (
 	"context"

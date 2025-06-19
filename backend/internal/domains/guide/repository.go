@@ -1,4 +1,4 @@
-package gamguide
+package guide
 
 import (
 	"github.com/google/uuid"
