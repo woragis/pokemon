@@ -5,6 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
+/************************
+ * REPOSITORY INTERFACE *
+ ************************/
+
 type favoritepokemonRepository interface {
 	create(mon *FavoritePokemon) error
 	listByPopular() ([]FavoritePokemon, error)
@@ -21,6 +25,10 @@ type repository struct {
 func newFavoritePokemonRepository(db *gorm.DB) favoritepokemonRepository {
 	return &repository{db}
 }
+
+/*****************************
+ * REPOSITORY IMPLEMENTATION *
+ *****************************/
 
 func (r *repository) create(mon *FavoritePokemon) error {
 	return r.db.Create(mon).Error
