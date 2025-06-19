@@ -1,6 +1,7 @@
 package gamguide
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,4 +37,24 @@ type GameGuideLike struct {
 	GuideID   uuid.UUID `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_guide_like" json:"guide_id"`
 	UserID    uuid.UUID `gorm:"type:uuid;not null;index;uniqueIndex:idx_user_guide_like" json:"user_id"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+/***************
+ * VALIDATIONS *
+ ***************/
+
+func (g *GameGuide) Validate() error {
+	if g.Title == "" {
+		return errors.New("title is required")
+	}
+	if g.Slug == "" {
+		return errors.New("slug is required")
+	}
+	if g.Content == "" {
+		return errors.New("content is required")
+	}
+	if g.AuthorID == uuid.Nil {
+		return errors.New("author_id is required")
+	}
+	return nil
 }
