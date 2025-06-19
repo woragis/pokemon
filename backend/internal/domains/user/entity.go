@@ -20,6 +20,10 @@ type User struct {
     DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }
 
+/************
+ * REQUESTS *
+ ************/
+
 type createUserRequest struct {
     Email     string `json:"email" validate:"required,email"`
     Username  string `json:"username" validate:"required,min=3,max=20"`
