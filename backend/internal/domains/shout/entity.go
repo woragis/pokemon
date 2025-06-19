@@ -10,6 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
+/********
+ * MAIN *
+ ********/
+
 type Shout struct {
 	ID           uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	UserID       uuid.UUID      `gorm:"type:uuid;not null;index" json:"user_id"`
@@ -32,6 +36,10 @@ type Shout struct {
 	CommentCount int            `gorm:"default:0" json:"comment_count"`
 	IsFlagged    bool           `gorm:"default:false" json:"is_flagged"`
 }
+
+/****************
+ * INTERACTIONS *
+ ****************/
 
 type ShoutComment struct {
 	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
@@ -83,6 +91,10 @@ type ShoutView struct {
 	User  user.User `gorm:"foreignKey:UserID" json:"user"`
 	Shout Shout     `gorm:"foreignKey:ShoutID" json:"shout"`
 }
+
+/***************
+ * VALIDATIONS *
+ ***************/
 
 func (s *Shout) Validate() error {
 	if err := validation.UUIDRequired(s.UserID, "user_id"); err != nil {
