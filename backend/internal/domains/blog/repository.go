@@ -18,10 +18,6 @@ type blogRepository interface {
 	delete(id uuid.UUID) error
 }
 
-/*****************************
- * REPOSITORY IMPLEMENTATION *
- *****************************/
-
 type repository struct {
 	db *gorm.DB
 }
@@ -29,6 +25,10 @@ type repository struct {
 func newRepository(db *gorm.DB) blogRepository {
 	return &repository{db}
 }
+
+/*****************************
+ * REPOSITORY IMPLEMENTATION *
+ *****************************/
 
 func (r *repository) create(post *Post) error {
 	return r.db.Create(post).Error
