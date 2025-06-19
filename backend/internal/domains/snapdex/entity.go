@@ -9,6 +9,10 @@ import (
 	"github.com/lib/pq"
 )
 
+/********
+ * MAIN *
+ ********/
+
 // Snap represents a media post.
 type Snap struct {
 	ID            uuid.UUID      `json:"id" gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
@@ -25,6 +29,10 @@ type Snap struct {
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
 }
+
+/****************
+ * INTERACTIONS *
+ ****************/
 
 // SnapComment represents a comment on a Snap.
 type SnapComment struct {
