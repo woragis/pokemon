@@ -8,7 +8,7 @@ import (
 	"pokemon/pkg/utils"
 
 	"pokemon/internal/domains/blog"
-	favoritepokemon "pokemon/internal/domains/favorite-pokemon"
+	favMon "pokemon/internal/domains/favorite-pokemon"
 	"pokemon/internal/domains/forum"
 	"pokemon/internal/domains/guide"
 	"pokemon/internal/domains/shout"
@@ -55,7 +55,7 @@ func main() {
     // Initialize domains
     user.NewHandler(db, redis).RegisterRoutes(api)
     blog.NewHandler(db, redis).RegisterRoutes(api)
-    favoritepokemon.NewHandler(db, redis).RegisterRoutes(api)
+    favMon.NewHandler(db, redis).RegisterRoutes(api)
     forum.NewHandler(db, redis).RegisterRoutes(api)
     guide.NewHandler(db, redis).RegisterRoutes(api)
     shout.NewHandler(db, redis).RegisterRoutes(api)
