@@ -5,14 +5,19 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 )
 
 type gameGuideHandler struct {
 	s gameGuideService
 }
 
-func NewHandler(service gameGuideService) *gameGuideHandler {
-	return &gameGuideHandler{s: service}
+func NewHandler(db *gorm.DB, redis *redis.Client) *gameGuideHandler {
+	repo := newGameGuideRepo(db)
+	serv := newGameGuideService(repo, redis)
+
+	return &gameGuideHandler{s: serv}
 }
 
 func (h *gameGuideHandler) create(c *fiber.Ctx) error {
@@ -117,14 +122,14 @@ func (h *gameGuideHandler) list(c *fiber.Ctx) error {
 	return c.JSON(guides)
 }
 
-func (h *gameGuideHandler) listByAuthor(c *fiber.Ctx) error {
-	authorID, err := uuid.Parse(c.Params("author_id"))
+func (h *gameGuideHandler) listByUser(c *fiber.Ctx) error {
+	userID, err := uuid.Parse(c.Params("user_id"))
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "invalid author_id")
+		return fiber.NewError(fiber.StatusBadRequest, "invalid user_id")
 	}
 
 	limit, offset := utils.ParsePagination(c)
-	guides, err := h.s.listByAuthor(authorID, limit, offset)
+	guides, err := h.s.listByAuthor(userID, limit, offset)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
