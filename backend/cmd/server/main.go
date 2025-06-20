@@ -11,6 +11,7 @@ import (
 	favMon "pokemon/internal/domains/favorite-pokemon"
 	"pokemon/internal/domains/forum"
 	"pokemon/internal/domains/guide"
+	"pokemon/internal/domains/news"
 	"pokemon/internal/domains/shout"
 	"pokemon/internal/domains/team"
 	"pokemon/internal/domains/user"
@@ -58,6 +59,7 @@ func main() {
     favMon.NewHandler(db, redis).RegisterRoutes(api)
     forum.NewHandler(db, redis).RegisterRoutes(api)
     guide.NewHandler(db, redis).RegisterRoutes(api)
+    news.NewHandler(db, redis).RegisterRoutes(api)
     shout.NewHandler(db, redis).RegisterRoutes(api)
     team.NewHandler(db, redis).RegisterRoutes(api)
     
