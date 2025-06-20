@@ -8,6 +8,7 @@ import (
 type repository interface {
 	list(limit, offset int) ([]News, error)
 	listByUser(userID uuid.UUID, limit, offset int) ([]News, error)
+	countByUser(userID uuid.UUID) (int64, error)
 
 	get(ID uuid.UUID) (News, error)
 	create(news News) error
@@ -60,4 +61,10 @@ func (r *repositoryImpl) update(news News) error {
 
 func (r *repositoryImpl) delete(ID, userID uuid.UUID) error {
 	return r.db.Delete(&News{}, "id = ? AND user_id = ?", ID, userID).Error
+}
+
+func (r *repositoryImpl) countByUser(userID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&News{}).Where("user_id = ?", userID).Count(&count).Error
+	return count, err
 }
