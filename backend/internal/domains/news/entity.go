@@ -1,14 +1,17 @@
 package news
 
 import (
+	"pokemon/internal/domains/user"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-type news struct {
+type News struct {
 	ID        uuid.UUID      `json:"id" gorm:"type:uuid;not null;default:gen_random_uuid()"`
+	UserID    uuid.UUID      `json:"user_id" gorm:"type:uuid;not null"`
+	User      user.User      `json:"user" gorm:"foreignKey:UserID"`
 	Title     string         `json:"title" gorm:"type:text;not null"`
 	SubTitle  string         `json:"subtitle" gorm:"type:text;not null"`
 	Body      string         `json:"body" gorm:"type:text;not null"`
@@ -18,7 +21,7 @@ type news struct {
 	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 }
 
-type newsView struct {
+type NewsView struct {
 	ID        uuid.UUID `json:"id" gorm:"type:uuid;not null;default:gen_random_uuid()"`
 	NewsID    uuid.UUID `json:"news_id" gorm:"type:uuid;index;not null"`
 	UserID    uuid.UUID `json:"user_id,omitempty" gorm:"type:uuid;index"`
