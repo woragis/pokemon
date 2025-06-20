@@ -1,11 +1,16 @@
 package news
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
-type newsService interface {
+type service interface {
 	create(news *News) error
 	get(id uuid.UUID) (*News, error)
 	list(limit, offset int) ([]News, error)
@@ -15,50 +20,164 @@ type newsService interface {
 	countByUser(userID uuid.UUID) (int64, error)
 }
 
-type service struct {
+type serviceImpl struct {
 	repo  repository
 	redis *redis.Client
 }
 
-func newService(repo repository, redis *redis.Client) newsService {
-	return &service{repo: repo, redis: redis}
+func newServ(repo repository, redis *redis.Client) service {
+	return &serviceImpl{repo: repo, redis: redis}
 }
 
-func (s *service) create(news *News) error {
+const cacheTTL = time.Minute * 5
+
+func (s *serviceImpl) create(news *News) error {
 	if err := news.Validate(); err != nil {
 		return err
 	}
-	return s.repo.create(*news)
+
+	if err := s.repo.create(*news); err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+	s.redis.Del(ctx,
+		fmt.Sprintf("news:list"),
+		fmt.Sprintf("news:user:%s", news.UserID),
+		fmt.Sprintf("news:count:user:%s", news.UserID),
+	)
+
+	return nil
 }
 
-func (s *service) get(id uuid.UUID) (*News, error) {
+func (s *serviceImpl) get(id uuid.UUID) (*News, error) {
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf("news:get:%s", id.String())
+
+	cached, err := s.redis.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var n News
+		if json.Unmarshal([]byte(cached), &n) == nil {
+			return &n, nil
+		}
+	}
+
 	n, err := s.repo.get(id)
 	if err != nil {
 		return nil, err
 	}
+
+	data, _ := json.Marshal(n)
+	s.redis.Set(ctx, cacheKey, data, cacheTTL)
+
 	return &n, nil
 }
 
-func (s *service) list(limit, offset int) ([]News, error) {
-	return s.repo.list(limit, offset)
+func (s *serviceImpl) list(limit, offset int) ([]News, error) {
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf("news:list:%d:%d", limit, offset)
+
+	cached, err := s.redis.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var result []News
+		if json.Unmarshal([]byte(cached), &result) == nil {
+			return result, nil
+		}
+	}
+
+	result, err := s.repo.list(limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	data, _ := json.Marshal(result)
+	s.redis.Set(ctx, cacheKey, data, cacheTTL)
+
+	return result, nil
 }
 
-func (s *service) listByUser(userID uuid.UUID, limit, offset int) ([]News, error) {
-	return s.repo.listByUser(userID, limit, offset)
+func (s *serviceImpl) listByUser(userID uuid.UUID, limit, offset int) ([]News, error) {
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf("news:user:%s:%d:%d", userID, limit, offset)
+
+	cached, err := s.redis.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var result []News
+		if json.Unmarshal([]byte(cached), &result) == nil {
+			return result, nil
+		}
+	}
+
+	result, err := s.repo.listByUser(userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	data, _ := json.Marshal(result)
+	s.redis.Set(ctx, cacheKey, data, cacheTTL)
+
+	return result, nil
 }
 
-func (s *service) update(news *News) error {
+func (s *serviceImpl) update(news *News) error {
 	if err := news.Validate(); err != nil {
 		return err
 	}
-	return s.repo.update(*news)
+
+	if err := s.repo.update(*news); err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+	s.redis.Del(ctx,
+		fmt.Sprintf("news:get:%s", news.ID),
+		fmt.Sprintf("news:list"),
+		fmt.Sprintf("news:user:%s", news.UserID),
+	)
+
+	return nil
 }
 
-func (s *service) delete(id uuid.UUID) error {
-	// optionally check user ownership here if needed
-	return s.repo.delete(id, uuid.Nil) // or pass userID if ownership required
+func (s *serviceImpl) delete(id uuid.UUID) error {
+	n, err := s.repo.get(id)
+	if err != nil {
+		return err
+	}
+
+	if err := s.repo.delete(id, n.UserID); err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+	s.redis.Del(ctx,
+		fmt.Sprintf("news:get:%s", id),
+		fmt.Sprintf("news:list"),
+		fmt.Sprintf("news:user:%s", n.UserID),
+		fmt.Sprintf("news:count:user:%s", n.UserID),
+	)
+
+	return nil
 }
 
-func (s *service) countByUser(userID uuid.UUID) (int64, error) {
-	return s.repo.countByUser(userID)
+func (s *serviceImpl) countByUser(userID uuid.UUID) (int64, error) {
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf("news:count:user:%s", userID)
+
+	cached, err := s.redis.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var count int64
+		if json.Unmarshal([]byte(cached), &count) == nil {
+			return count, nil
+		}
+	}
+
+	count, err := s.repo.countByUser(userID)
+	if err != nil {
+		return 0, err
+	}
+
+	data, _ := json.Marshal(count)
+	s.redis.Set(ctx, cacheKey, data, cacheTTL)
+
+	return count, nil
 }
