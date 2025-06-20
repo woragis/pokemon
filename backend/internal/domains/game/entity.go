@@ -9,8 +9,8 @@ import (
 )
 
 type Game struct {
-	ID         uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	Name       string    `json:"name" gorm:"type:text;not null"`
+	ID          uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	Name        string    `json:"name" gorm:"type:text;not null"`
 	Description string    `gorm:"type:text" json:"description"`
 	Generation  int       `gorm:"not null" json:"generation"`       // e.g., 1, 2, 3, etc.
 	ReleasedAt  time.Time `gorm:"not null" json:"released_at"`       // ISO or "YYYY-MM-DD"
