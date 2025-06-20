@@ -5,15 +5,19 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 )
 
 type handler struct {
-	service   service
+	s   service
 	// viewCache viewService
 }
 
-func NewHandler(s service) *handler {
-	return &handler{service: s}
+func NewHandler(db *gorm.DB, redis *redis.Client) *handler {
+	repo := newRepo(db)
+	serv := newServ(repo, redis)
+	return &handler{s: serv}
 }
 
 // POST /news
@@ -34,7 +38,7 @@ func (h *handler) create(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.create(&news); err != nil {
+	if err := h.s.create(&news); err != nil {
 		return err
 	}
 	return c.Status(fiber.StatusCreated).JSON(news)
@@ -47,7 +51,7 @@ func (h *handler) get(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	news, err := h.service.get(id)
+	news, err := h.s.get(id)
 	if err != nil {
 		return fiber.ErrNotFound
 	}
@@ -58,7 +62,7 @@ func (h *handler) get(c *fiber.Ctx) error {
 func (h *handler) list(c *fiber.Ctx) error {
 	limit, offset := utils.ParsePagination(c)
 
-	news, err := h.service.list(limit, offset)
+	news, err := h.s.list(limit, offset)
 	if err != nil {
 		return err
 	}
@@ -73,7 +77,7 @@ func (h *handler) listByUser(c *fiber.Ctx) error {
 	}
 	limit, offset := utils.ParsePagination(c)
 
-	news, err := h.service.listByUser(userID, limit, offset)
+	news, err := h.s.listByUser(userID, limit, offset)
 	if err != nil {
 		return err
 	}
@@ -104,7 +108,7 @@ func (h *handler) update(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.update(&news); err != nil {
+	if err := h.s.update(&news); err != nil {
 		return err
 	}
 	return c.SendStatus(fiber.StatusNoContent)
@@ -117,7 +121,7 @@ func (h *handler) delete(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	if err := h.service.delete(id); err != nil {
+	if err := h.s.delete(id); err != nil {
 		return err
 	}
 	return c.SendStatus(fiber.StatusNoContent)
