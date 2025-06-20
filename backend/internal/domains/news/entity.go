@@ -1,7 +1,9 @@
 package news
 
 import (
+	"errors"
 	"pokemon/internal/domains/user"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,4 +28,20 @@ type NewsView struct {
 	NewsID    uuid.UUID `json:"news_id" gorm:"type:uuid;index;not null"`
 	UserID    uuid.UUID `json:"user_id,omitempty" gorm:"type:uuid;index"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+func (n *News) Validate() error {
+	if n.UserID == uuid.Nil {
+		return errors.New("user_id is required")
+	}
+	if strings.TrimSpace(n.Title) == "" {
+		return errors.New("title is required")
+	}
+	if strings.TrimSpace(n.SubTitle) == "" {
+		return errors.New("subtitle is required")
+	}
+	if strings.TrimSpace(n.Body) == "" {
+		return errors.New("body is required")
+	}
+	return nil
 }
