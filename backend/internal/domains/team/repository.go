@@ -16,9 +16,13 @@ import (
  ************************/
 
 type teamRepository interface {
+	// listByPopular(limit, offset int) ([]Team, error)
+	list(limit, offset int) ([]Team, error)
+	listByUser(userID uuid.UUID, limit int, offset int) ([]Team, error)
+	countByUser(userID uuid.UUID) (int64, error)
+
 	create(team *Team) error
 	getByID(id uuid.UUID) (*Team, error)
-	listByUser(userID uuid.UUID, limit int, offset int) ([]Team, error)
 	update(team *Team) error
 	delete(id uuid.UUID) error
 }
@@ -43,6 +47,26 @@ func (r *repository) getByID(id uuid.UUID) (*Team, error) {
 	var team Team
 	err := r.db.Preload("Pokemon").First(&team, "id = ?", id).Error
 	return &team, err
+}
+
+func (r *repository) list(limit int, offset int) ([]Team, error) {
+	var teams []Team
+	err := r.db.
+		Preload("Pokemon").
+		Limit(limit).
+		Offset(offset).
+		Order("created_at DESC").
+		Find(&teams).Error
+	return teams, err
+}
+
+func (r *repository) countByUser(userID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.
+	 	Model(&Team{}).
+		Where("user_id = ?", userID).
+		Count(&count).Error
+	return count, err
 }
 
 func (r *repository) listByUser(userID uuid.UUID, limit int, offset int) ([]Team, error) {
