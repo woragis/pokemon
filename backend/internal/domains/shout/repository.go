@@ -12,15 +12,15 @@ import (
  **********************/
 
 type shoutRepository interface {
-	create(shout *Shout) error
-	getById(id uuid.UUID) (*Shout, error)
-	update(shout *Shout) error
-	delete(id uuid.UUID) error
-
 	list(limit, offset int) ([]Shout, error)
 	listByUser(userID uuid.UUID, limit, offset int) ([]Shout, error)
 	listByParent(reshoutID uuid.UUID, limit, offset int) ([]Shout, error)
 	countByUser(userID uuid.UUID) (int64, error)
+
+	create(shout *Shout) error
+	getById(id uuid.UUID) (*Shout, error)
+	update(shout *Shout) error
+	delete(id uuid.UUID) error
 }
 
 type shoutRepo struct {
