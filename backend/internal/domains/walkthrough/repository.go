@@ -6,6 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 type repository interface {
 	create(ctx context.Context, wt *Walkthrough) error
 	getByID(ctx context.Context, id string) (*Walkthrough, error)
@@ -106,3 +112,9 @@ func (r *repositoryImpl) listComments(ctx context.Context, walkthroughID string,
 	}
 	return list, count, nil
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/

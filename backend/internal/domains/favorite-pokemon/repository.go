@@ -5,14 +5,22 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 /************************
  * REPOSITORY INTERFACE *
  ************************/
 
 type favoritepokemonRepository interface {
-	create(mon *FavoritePokemon) error
 	listByPopular() ([]FavoritePokemon, error)
 	listByUser(userID uuid.UUID) ([]FavoritePokemon, error)
+	// countByUser(userID uuid.UUID) (int64, error)
+
+	create(mon *FavoritePokemon) error
 	getByID(id uuid.UUID) (*FavoritePokemon, error)
 	update(mon *FavoritePokemon) error
 	delete(id uuid.UUID) error
@@ -66,3 +74,9 @@ func (r *repository) update(mon *FavoritePokemon) error {
 func (r *repository) delete(id uuid.UUID) error {
 	return r.db.Delete(&FavoritePokemon{}, "id = ?", id).Error
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/

@@ -6,10 +6,17 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 type gameRepository interface {
+	list(ctx context.Context, limit, offset int) ([]Game, int64, error)
+
 	create(ctx context.Context, game *Game) error
 	getByID(ctx context.Context, id string) (*Game, error)
-	list(ctx context.Context, limit, offset int) ([]Game, int64, error)
 	update(ctx context.Context, game *Game) error
 	delete(ctx context.Context, id string) error
 }
@@ -122,3 +129,9 @@ func (r *gamePokedexRepoImpl) update(ctx context.Context, pokedex *GamePokedex) 
 func (r *gamePokedexRepoImpl) delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Delete(&GamePokedex{}, "id = ?", id).Error
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/

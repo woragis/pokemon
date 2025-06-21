@@ -19,8 +19,8 @@ type Post struct {
 	Title     string         `gorm:"not null" json:"title"`
 	Content   string         `gorm:"type:text;not null" json:"content"`
 
-	AuthorID  uuid.UUID      `gorm:"type:uuid;not null" json:"author_id"`                         // FK field
-	Author    user.User      `gorm:"foreignKey:AuthorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"author"` // preloadable
+	UserID    uuid.UUID      `gorm:"type:uuid;not null" json:"user_id"`                         // FK field
+	User      user.User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"user"` // preloadable
 	Pinned    bool           `gorm:"default:false" json:"pinned"`
 
 	CreatedAt time.Time      `json:"created_at"`
@@ -34,8 +34,8 @@ type Post struct {
 type Response struct {
 	ID           uuid.UUID `json:"id"`
 	Title        string    `json:"title"`
-	Author       string    `json:"author"`
-	AuthorAvatar string    `json:"author_avatar"`
+	User         string    `json:"user"`
+	Avatar       string    `json:"avatar"`
 	Date         string    `json:"date"`       // formatted date string (e.g., RFC3339 or "Jan 2, 2006")
 	Replies      int64     `json:"replies"`    // total comments or replies
 	Likes        int64     `json:"likes"`      // total likes
@@ -65,7 +65,7 @@ func (p *Post) Validate() error {
 	}
 
 	// Check if AuthorID is zero (all zeros UUID means not set)
-	if p.AuthorID == uuid.Nil {
+	if p.UserID == uuid.Nil {
 		return errors.New("author_id is required and must be valid")
 	}
 

@@ -5,15 +5,23 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 /************************
  * REPOSITORY INTERFACE *
  ************************/
 
 type blogRepository interface {
+	list(limit int, offset int) ([]Post, error)
+	listByUser(userID uuid.UUID, limit int, offset int) ([]Post, error)
+	// countByUser(userID uuid.UUID) (int64, error)
+
 	create(post *Post) error
 	getByID(id uuid.UUID) (*Post, error)
-	listByUser(userID uuid.UUID, limit int, offset int) ([]Post, error)
-	list(limit int, offset int) ([]Post, error)
 	update(post *Post) error
 	delete(id uuid.UUID) error
 }
@@ -36,14 +44,14 @@ func (r *repository) create(post *Post) error {
 
 func (r *repository) getByID(id uuid.UUID) (*Post, error) {
 	var post Post
-	err := r.db.Preload("Author").First(&post, "id = ?", id).Error
+	err := r.db.Preload("Userr").First(&post, "id = ?", id).Error
 	return &post, err
 }
 
 func (r *repository) listByUser(userID uuid.UUID, limit int, offset int) ([]Post, error) {
 	var posts []Post
 	err := r.db.
-		Preload("Author").
+		Preload("Userr").
 		Limit(limit).
 		Offset(offset).
 		Where("user_id = ?", userID).
@@ -54,7 +62,7 @@ func (r *repository) listByUser(userID uuid.UUID, limit int, offset int) ([]Post
 func (r *repository) list(limit int, offset int) ([]Post, error) {
 	var posts []Post
 	err := r.db.
-		Preload("Author").
+		Preload("User").
 		Limit(limit).
 		Offset(offset).
 		Order("created_at ASC").
@@ -69,3 +77,9 @@ func (r *repository) update(post *Post) error {
 func (r *repository) delete(id uuid.UUID) error {
 	return r.db.Delete(&Post{}, "id = ?", id).Error
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/

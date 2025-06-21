@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 /*****************************
  * MAIN REPOSITORY INTERFACE *
  *****************************/
@@ -12,50 +18,50 @@ import (
 /* GAME GUIDE */
 
 type gameGuideRepository interface {
+	list(limit, offset int) ([]GameGuide, error)
+	listByUser(userID uuid.UUID, limit, offset int) ([]GameGuide, error)
+	countByUser(userID uuid.UUID) (int64, error)
+
 	create(guide *GameGuide) error
 	getByID(id uuid.UUID) (*GameGuide, error)
 	getBySlug(slug string) (*GameGuide, error)
 	update(guide *GameGuide) error
 	delete(id uuid.UUID) error
-
-	list(limit, offset int) ([]GameGuide, error)
-	listByAuthor(authorID uuid.UUID, limit, offset int) ([]GameGuide, error)
-	countByAuthor(authorID uuid.UUID) (int64, error)
 }
 
-type gameGuideRepo struct {
+type gameGuideRepoImpl struct {
 	db *gorm.DB
 }
 
 func newGameGuideRepo(db *gorm.DB) gameGuideRepository {
-	return &gameGuideRepo{db: db}
+	return &gameGuideRepoImpl{db: db}
 }
 
-func (r *gameGuideRepo) create(guide *GameGuide) error {
+func (r *gameGuideRepoImpl) create(guide *GameGuide) error {
 	return r.db.Create(guide).Error
 }
 
-func (r *gameGuideRepo) getByID(id uuid.UUID) (*GameGuide, error) {
+func (r *gameGuideRepoImpl) getByID(id uuid.UUID) (*GameGuide, error) {
 	var guide GameGuide
 	err := r.db.Preload("Tags").First(&guide, "id = ?", id).Error
 	return &guide, err
 }
 
-func (r *gameGuideRepo) getBySlug(slug string) (*GameGuide, error) {
+func (r *gameGuideRepoImpl) getBySlug(slug string) (*GameGuide, error) {
 	var guide GameGuide
 	err := r.db.Preload("Tags").First(&guide, "slug = ?", slug).Error
 	return &guide, err
 }
 
-func (r *gameGuideRepo) update(guide *GameGuide) error {
+func (r *gameGuideRepoImpl) update(guide *GameGuide) error {
 	return r.db.Save(guide).Error
 }
 
-func (r *gameGuideRepo) delete(id uuid.UUID) error {
+func (r *gameGuideRepoImpl) delete(id uuid.UUID) error {
 	return r.db.Delete(&GameGuide{}, "id = ?", id).Error
 }
 
-func (r *gameGuideRepo) list(limit, offset int) ([]GameGuide, error) {
+func (r *gameGuideRepoImpl) list(limit, offset int) ([]GameGuide, error) {
 	var guides []GameGuide
 	err := r.db.Preload("Tags").
 		Order("created_at DESC").
@@ -65,7 +71,7 @@ func (r *gameGuideRepo) list(limit, offset int) ([]GameGuide, error) {
 	return guides, err
 }
 
-func (r *gameGuideRepo) listByAuthor(authorID uuid.UUID, limit, offset int) ([]GameGuide, error) {
+func (r *gameGuideRepoImpl) listByUser(authorID uuid.UUID, limit, offset int) ([]GameGuide, error) {
 	var guides []GameGuide
 	err := r.db.Preload("Tags").
 		Where("author_id = ?", authorID).
@@ -76,7 +82,7 @@ func (r *gameGuideRepo) listByAuthor(authorID uuid.UUID, limit, offset int) ([]G
 	return guides, err
 }
 
-func (r *gameGuideRepo) countByAuthor(authorID uuid.UUID) (int64, error) {
+func (r *gameGuideRepoImpl) countByUser(authorID uuid.UUID) (int64, error) {
 	var count int64
 	err := r.db.Model(&GameGuide{}).
 		Where("author_id = ?", authorID).
@@ -115,6 +121,12 @@ func (r *gameGuideTagRepo) listAll() ([]GameGuideTag, error) {
 	err := r.db.Order("name ASC").Find(&tags).Error
 	return tags, err
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/
 
 /***************************
  * INTERACTIONS REPOSITORY *

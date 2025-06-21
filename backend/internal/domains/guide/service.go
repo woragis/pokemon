@@ -85,11 +85,11 @@ func (s *gameGuideServ) list(limit, offset int) ([]GameGuide, error) {
 }
 
 func (s *gameGuideServ) listByAuthor(authorID uuid.UUID, limit, offset int) ([]GameGuide, error) {
-	return s.repo.listByAuthor(authorID, limit, offset)
+	return s.repo.listByUser(authorID, limit, offset)
 }
 
 func (s *gameGuideServ) countByAuthor(authorID uuid.UUID) (int64, error) {
-	return s.repo.countByAuthor(authorID)
+	return s.repo.countByUser(authorID)
 }
 
 /* GAME GUIDE TAG */

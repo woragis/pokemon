@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 type repository interface {
 	list(limit, offset int) ([]News, error)
 	listByUser(userID uuid.UUID, limit, offset int) ([]News, error)
@@ -68,3 +74,9 @@ func (r *repositoryImpl) countByUser(userID uuid.UUID) (int64, error) {
 	err := r.db.Model(&News{}).Where("user_id = ?", userID).Count(&count).Error
 	return count, err
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/

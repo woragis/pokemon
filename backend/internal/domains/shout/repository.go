@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 type shoutRepository interface {
 	create(shout *Shout) error
 	getById(id uuid.UUID) (*Shout, error)
@@ -89,6 +95,12 @@ func (r *shoutRepo) countByUser(userID uuid.UUID) (int64, error) {
 	err := r.db.Model(&Shout{}).Where("user_id = ?", userID).Count(&count).Error
 	return count, err
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/
 
 /*************************************
  * INTERACTIONS REPOSITORY INTERFACE *

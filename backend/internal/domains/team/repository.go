@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+/**********************
+ **********************
+ ******** MAIN ********
+ **********************
+ **********************/
+
 /************************
  * REPOSITORY INTERFACE *
  ************************/
@@ -191,3 +197,9 @@ func (r *interactionRepository) countComments(teamID uuid.UUID) (int64, error) {
 	err := r.db.Model(&TeamComment{}).Where("team_id = ?", teamID).Count(&count).Error
 	return count, err
 }
+
+/******************************
+ ******************************
+ ******** INTERACTIONS ********
+ ******************************
+ ******************************/
