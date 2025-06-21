@@ -15,6 +15,7 @@ import (
 	"pokemon/internal/domains/shout"
 	"pokemon/internal/domains/team"
 	"pokemon/internal/domains/user"
+	"pokemon/internal/domains/walkthrough"
 	"pokemon/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
@@ -62,6 +63,7 @@ func main() {
     news.NewHandler(db, redis).RegisterRoutes(api)
     shout.NewHandler(db, redis).RegisterRoutes(api)
     team.NewHandler(db, redis).RegisterRoutes(api)
+    walkthrough.NewHandler(db, redis).RegisterRoutes(api)
     
     log.Fatal(app.Listen(":" + cfg.Port))
 }
