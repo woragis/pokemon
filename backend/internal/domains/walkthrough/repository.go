@@ -13,9 +13,10 @@ import (
  **********************/
 
 type repository interface {
+	list(ctx context.Context, limit, offset int) ([]Walkthrough, int64, error)
+
 	create(ctx context.Context, wt *Walkthrough) error
 	getByID(ctx context.Context, id string) (*Walkthrough, error)
-	list(ctx context.Context, limit, offset int) ([]Walkthrough, int64, error)
 	update(ctx context.Context, wt *Walkthrough) error
 	delete(ctx context.Context, id string) error
 
