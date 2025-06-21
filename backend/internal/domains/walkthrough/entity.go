@@ -12,8 +12,8 @@ type Walkthrough struct {
 	ID        uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	Title     string         `gorm:"not null" json:"title"`                          // e.g. "Pokémon Scarlet Full Walkthrough"
 	Game      string         `gorm:"not null" json:"game"`                          // e.g. "Scarlet", "Violet", etc.
-	AuthorID  uuid.UUID      `gorm:"type:uuid;not null" json:"author_id"`           // FK to users
-	Author    user.User      `gorm:"foreignKey:AuthorID" json:"author"`
+	UserID    uuid.UUID      `gorm:"type:uuid;not null" json:"user_id"`           // FK to users
+	User      user.User      `gorm:"foreignKey:UserID" json:"user"`
 	Tags      pq.StringArray `gorm:"type:text[]" json:"tags"`                       // Optional: ["Story", "Guide", "Exploration"]
 
 	Steps     []WalkthroughStep `gorm:"foreignKey:WalkthroughID" json:"steps"`     // Walkthrough content sections
