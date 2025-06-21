@@ -6,27 +6,27 @@ import (
 	"gorm.io/gorm"
 )
 
-type GameRepository interface {
-	Create(ctx context.Context, game *Game) error
-	GetByID(ctx context.Context, id string) (*Game, error)
-	List(ctx context.Context, limit, offset int) ([]Game, int64, error)
-	Update(ctx context.Context, game *Game) error
-	Delete(ctx context.Context, id string) error
+type gameRepository interface {
+	create(ctx context.Context, game *Game) error
+	getByID(ctx context.Context, id string) (*Game, error)
+	list(ctx context.Context, limit, offset int) ([]Game, int64, error)
+	update(ctx context.Context, game *Game) error
+	delete(ctx context.Context, id string) error
 }
 
-type GameRepo struct {
+type gameRepoImpl struct {
 	db *gorm.DB
 }
 
-func NewGameRepo(db *gorm.DB) GameRepository {
-	return &GameRepo{db: db}
+func newGameRepo(db *gorm.DB) gameRepository {
+	return &gameRepoImpl{db: db}
 }
 
-func (r *GameRepo) Create(ctx context.Context, game *Game) error {
+func (r *gameRepoImpl) create(ctx context.Context, game *Game) error {
 	return r.db.WithContext(ctx).Create(game).Error
 }
 
-func (r *GameRepo) GetByID(ctx context.Context, id string) (*Game, error) {
+func (r *gameRepoImpl) getByID(ctx context.Context, id string) (*Game, error) {
 	var game Game
 	if err := r.db.WithContext(ctx).First(&game, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (r *GameRepo) GetByID(ctx context.Context, id string) (*Game, error) {
 	return &game, nil
 }
 
-func (r *GameRepo) List(ctx context.Context, limit, offset int) ([]Game, int64, error) {
+func (r *gameRepoImpl) list(ctx context.Context, limit, offset int) ([]Game, int64, error) {
 	var games []Game
 	var count int64
 
@@ -50,11 +50,11 @@ func (r *GameRepo) List(ctx context.Context, limit, offset int) ([]Game, int64, 
 	return games, count, nil
 }
 
-func (r *GameRepo) Update(ctx context.Context, game *Game) error {
+func (r *gameRepoImpl) update(ctx context.Context, game *Game) error {
 	return r.db.WithContext(ctx).Save(game).Error
 }
 
-func (r *GameRepo) Delete(ctx context.Context, id string) error {
+func (r *gameRepoImpl) delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Delete(&Game{}, "id = ?", id).Error
 }
 
@@ -62,28 +62,28 @@ func (r *GameRepo) Delete(ctx context.Context, id string) error {
  * GAME POKEDEX *
  ****************/
 
-type GamePokedexRepository interface {
-	Create(ctx context.Context, pokedex *GamePokedex) error
-	GetByID(ctx context.Context, id string) (*GamePokedex, error)
-	GetByUserAndGame(ctx context.Context, userID, gameID string) (*GamePokedex, error)
-	ListByUser(ctx context.Context, userID string, limit, offset int) ([]GamePokedex, int64, error)
-	Update(ctx context.Context, pokedex *GamePokedex) error
-	Delete(ctx context.Context, id string) error
+type gamePokedexRepository interface {
+	create(ctx context.Context, pokedex *GamePokedex) error
+	getByID(ctx context.Context, id string) (*GamePokedex, error)
+	getByUserAndGame(ctx context.Context, userID, gameID string) (*GamePokedex, error)
+	listByUser(ctx context.Context, userID string, limit, offset int) ([]GamePokedex, int64, error)
+	update(ctx context.Context, pokedex *GamePokedex) error
+	delete(ctx context.Context, id string) error
 }
 
-type GamePokedexRepo struct {
+type gamePokedexRepoImpl struct {
 	db *gorm.DB
 }
 
-func NewGamePokedexRepo(db *gorm.DB) GamePokedexRepository {
-	return &GamePokedexRepo{db: db}
+func newGamePokedexRepo(db *gorm.DB) gamePokedexRepository {
+	return &gamePokedexRepoImpl{db: db}
 }
 
-func (r *GamePokedexRepo) Create(ctx context.Context, pokedex *GamePokedex) error {
+func (r *gamePokedexRepoImpl) create(ctx context.Context, pokedex *GamePokedex) error {
 	return r.db.WithContext(ctx).Create(pokedex).Error
 }
 
-func (r *GamePokedexRepo) GetByID(ctx context.Context, id string) (*GamePokedex, error) {
+func (r *gamePokedexRepoImpl) getByID(ctx context.Context, id string) (*GamePokedex, error) {
 	var pdx GamePokedex
 	if err := r.db.WithContext(ctx).Preload("Game").Preload("User").First(&pdx, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (r *GamePokedexRepo) GetByID(ctx context.Context, id string) (*GamePokedex,
 	return &pdx, nil
 }
 
-func (r *GamePokedexRepo) GetByUserAndGame(ctx context.Context, userID, gameID string) (*GamePokedex, error) {
+func (r *gamePokedexRepoImpl) getByUserAndGame(ctx context.Context, userID, gameID string) (*GamePokedex, error) {
 	var pdx GamePokedex
 	if err := r.db.WithContext(ctx).Preload("Game").Preload("User").Where("user_id = ? AND game_id = ?", userID, gameID).First(&pdx).Error; err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (r *GamePokedexRepo) GetByUserAndGame(ctx context.Context, userID, gameID s
 	return &pdx, nil
 }
 
-func (r *GamePokedexRepo) ListByUser(ctx context.Context, userID string, limit, offset int) ([]GamePokedex, int64, error) {
+func (r *gamePokedexRepoImpl) listByUser(ctx context.Context, userID string, limit, offset int) ([]GamePokedex, int64, error) {
 	var entries []GamePokedex
 	var count int64
 
@@ -115,10 +115,10 @@ func (r *GamePokedexRepo) ListByUser(ctx context.Context, userID string, limit, 
 	return entries, count, nil
 }
 
-func (r *GamePokedexRepo) Update(ctx context.Context, pokedex *GamePokedex) error {
+func (r *gamePokedexRepoImpl) update(ctx context.Context, pokedex *GamePokedex) error {
 	return r.db.WithContext(ctx).Save(pokedex).Error
 }
 
-func (r *GamePokedexRepo) Delete(ctx context.Context, id string) error {
+func (r *gamePokedexRepoImpl) delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Delete(&GamePokedex{}, "id = ?", id).Error
 }
