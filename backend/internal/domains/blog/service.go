@@ -21,23 +21,23 @@ type postService interface {
 	listPosts(limit int, offset int) ([]Post, error)
 	updatePost(post *Post) error
 	deletePost(id uuid.UUID) error
-	// searchPosts(query string, limit int, offset int) ([]Post, error)
-	// listPostsByTag(tag string, limit int, offset int) ([]Post, error)
-	// listRecentPosts(limit int) ([]Post, error)
-	// softDeletePost(id uuid.UUID) error
-	// restorePost(id uuid.UUID) error
-	// listDeletedPosts(limit int, offset int) ([]Post, error)
-	// listReportedPosts(limit int, offset int) ([]Post, error)
-	// isUserPostAuthor(postID, userID uuid.UUID) (bool, error)
-	// countPostsByUser(userID uuid.UUID) (int, error)
-	// countTotalPosts() (int, error)
-	// archivePost(id uuid.UUID) error
-	// restorePost(id uuid.UUID) error
-	// postExists(id uuid.UUID) (bool, error)
+	searchPosts(query string, limit int, offset int) ([]Post, error)
+	listPostsByTag(tag string, limit int, offset int) ([]Post, error)
+	listRecentPosts(limit int) ([]Post, error)
+	softDeletePost(id uuid.UUID) error
+	restorePost(id uuid.UUID) error
+	listDeletedPosts(limit int, offset int) ([]Post, error)
+	listReportedPosts(limit int, offset int) ([]Post, error)
+	isUserPostAuthor(postID, userID uuid.UUID) (bool, error)
+	countPostsByUser(userID uuid.UUID) (int, error)
+	countTotalPosts() (int, error)
+	archivePost(id uuid.UUID) error
+	restorePost(id uuid.UUID) error
+	postExists(id uuid.UUID) (bool, error)
 
-	// incrementPostViewCount(id uuid.UUID) error
-	// likePost(userID uuid.UUID, postID uuid.UUID) error
-	// unlikePost(userID uuid.UUID, postID uuid.UUID) error
+	incrementPostViewCount(id uuid.UUID) error
+	likePost(userID uuid.UUID, postID uuid.UUID) error
+	unlikePost(userID uuid.UUID, postID uuid.UUID) error
 }
 
 func redisPostKey(id uuid.UUID) string {
@@ -138,4 +138,159 @@ func (s *service) deletePost(id uuid.UUID) error {
 	s.redis.Del(context.Background(), redisPostKey(id))
 
 	return nil
+}
+
+/************************************
+ ************************************
+ ************ EXTENSIONS ************
+ ************************************
+ ************************************/
+
+/************************
+ * SEARCH AND FILTERING *
+ ************************/
+
+func (s *service) searchPosts(query string, limit int, offset int) ([]Post, error) {
+	var posts []Post
+	err := s.repo.(*repository).db.
+		Preload("User").
+		Where("title ILIKE ? OR content ILIKE ?", "%"+query+"%", "%"+query+"%").
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error
+	return posts, err
+}
+
+func (s *service) listPostsByTag(tag string, limit int, offset int) ([]Post, error) {
+	var posts []Post
+	err := s.repo.(*repository).db.
+		Joins("JOIN post_tags ON post_tags.post_id = posts.id").
+		Joins("JOIN tags ON tags.id = post_tags.tag_id").
+		Where("tags.name = ?", tag).
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error
+	return posts, err
+}
+
+func (s *service) listRecentPosts(limit int) ([]Post, error) {
+	var posts []Post
+	err := s.repo.(*repository).db.
+		Order("created_at DESC").
+		Limit(limit).
+		Preload("User").
+		Find(&posts).Error
+	return posts, err
+}
+
+/***************************
+ * POST STATE MANAGEMENT   *
+ ***************************/
+
+func (s *service) softDeletePost(id uuid.UUID) error {
+	return s.repo.(*repository).db.
+		Model(&Post{}).
+		Where("id = ?", id).
+		Update("deleted_at", time.Now()).
+		Error
+}
+
+func (s *service) restorePost(id uuid.UUID) error {
+	return s.repo.(*repository).db.
+		Model(&Post{}).
+		Unscoped().
+		Where("id = ?", id).
+		Update("deleted_at", nil).
+		Error
+}
+
+func (s *service) listDeletedPosts(limit int, offset int) ([]Post, error) {
+	var posts []Post
+	err := s.repo.(*repository).db.
+		Unscoped().
+		Where("deleted_at IS NOT NULL").
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error
+	return posts, err
+}
+
+func (s *service) archivePost(id uuid.UUID) error {
+	return s.repo.(*repository).db.
+		Model(&Post{}).
+		Where("id = ?", id).
+		Update("archived", true).
+		Error
+}
+
+/***************************
+ * METRICS AND VALIDATION  *
+ ***************************/
+
+func (s *service) isUserPostAuthor(postID, userID uuid.UUID) (bool, error) {
+	post, err := s.repo.getByID(postID)
+	if err != nil {
+		return false, err
+	}
+	return post.UserID == userID, nil
+}
+
+func (s *service) countPostsByUser(userID uuid.UUID) (int, error) {
+	var count int64
+	err := s.repo.(*repository).db.
+		Model(&Post{}).
+		Where("user_id = ?", userID).
+		Count(&count).Error
+	return int(count), err
+}
+
+func (s *service) countTotalPosts() (int, error) {
+	var count int64
+	err := s.repo.(*repository).db.
+		Model(&Post{}).
+		Count(&count).Error
+	return int(count), err
+}
+
+func (s *service) postExists(id uuid.UUID) (bool, error) {
+	var count int64
+	err := s.repo.(*repository).db.
+		Model(&Post{}).
+		Where("id = ?", id).
+		Count(&count).Error
+	return count > 0, err
+}
+
+/**************************
+ * INTERACTION FEATURES   *
+ **************************/
+
+func (s *service) incrementPostViewCount(id uuid.UUID) error {
+	return s.repo.(*repository).db.
+		Model(&Post{}).
+		Where("id = ?", id).
+		UpdateColumn("view_count", gorm.Expr("view_count + 1")).
+		Error
+}
+
+func (s *service) likePost(userID uuid.UUID, postID uuid.UUID) error {
+	like := PostLike{UserID: userID, PostID: postID}
+	return s.repo.(*repository).db.Create(&like).Error
+}
+
+func (s *service) unlikePost(userID uuid.UUID, postID uuid.UUID) error {
+	return s.repo.(*repository).db.
+		Where("user_id = ? AND post_id = ?", userID, postID).
+		Delete(&PostLike{}).Error
+}
+
+func (s *service) listReportedPosts(limit int, offset int) ([]Post, error) {
+	var posts []Post
+	err := s.repo.(*repository).db.
+		Joins("JOIN post_reports ON post_reports.post_id = posts.id").
+		Group("posts.id").
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error
+	return posts, err
 }
